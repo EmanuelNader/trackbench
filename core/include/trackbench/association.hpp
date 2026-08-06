@@ -21,10 +21,9 @@ constexpr double kCostInf = 1e9;
 std::vector<int> hungarian_minimize(const std::vector<std::vector<double>>& cost);
 
 /// Associate tracks to detections.
-/// Cost = squared Mahalanobis distance in position; INF outside gate.
-/// Gate: class match AND Euclidean distance <= gate_m AND
-/// squared Mahalanobis <= gate_mahalanobis AND (for moving tracks with
-/// hits >= 2) velocity-consistency: lateral / rear innovation limits.
+/// Cost = squared Mahalanobis in position (+ soft lateral-velocity penalty);
+/// INF outside gate. Gate: class match AND Euclidean <= gate_m AND
+/// squared Mahalanobis <= gate_mahalanobis.
 /// Determinism: tracks are matched in caller order; ties broken by
 /// (track id via row order, detection index).
 std::vector<Association> associate(

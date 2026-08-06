@@ -242,24 +242,20 @@ std::vector<Association> associate(const std::vector<Track>& tracks,
         continue;
       }
 
-      // Velocity consistency (M6): reject same-class nearby swaps when the
-      // detection disagrees with the track's motion. Applied only once the
-      // track has a usable velocity estimate.
+      // Soft velocity penalty (M6): prefer associations aligned with motion
+      // without hard-rejecting (hard gates increased IDS/FN on mini).
+      double cost_ij = m2;
       const double speed = std::hypot(tr.vx, tr.vy);
-      if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed) {
+      if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed &&
+          cfg.vel_gate_lateral_m > 0.0 && cfg.vel_cost_weight > 0.0) {
         const double ux = tr.vx / speed;
         const double uy = tr.vy / speed;
-        const double along = ux * dx + uy * dy;
         const double lat = std::fabs(-uy * dx + ux * dy);
-        if (lat > cfg.vel_gate_lateral_m) {
-          continue;
-        }
-        if (along < -cfg.vel_gate_rear_m) {
-          continue;
-        }
+        const double lat_n = lat / cfg.vel_gate_lateral_m;
+        cost_ij += cfg.vel_cost_weight * lat_n * lat_n;
       }
 
-      cost[i][j] = m2;
+      cost[i][j] = cost_ij;
     }
   }
 

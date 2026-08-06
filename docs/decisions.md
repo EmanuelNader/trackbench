@@ -48,8 +48,8 @@ Recorded at M0. Rationale is public-source only.
 
 **Why:** Matches the nuScenes tracking class set. Raw Megvii dumps include barriers/cones/low-score junk that dominate FP and make MOTA uninterpretable. See finding `001`.
 
-## D8 — Velocity-consistency association gate
+## D8 — Soft velocity cost + birth score threshold
 
-**Choice:** After position Mahalanobis gating, reject associations that are laterally inconsistent with track velocity (or too far behind) for tracks with `hits >= 2` and speed ≥ 1 m/s.
+**Choice:** Prefer associations aligned with track velocity via a **soft lateral cost** (not a hard reject). Tighten `gate_m` to 1.5 m. Only **birth** tracks from detections with score ≥ 0.5.
 
-**Why:** M6 response to mined dense-traffic `ID_SWITCH` clusters. Position-only cost swaps IDs between nearby same-class objects. See `docs/findings/001-dense-id-switch-velocity-gate.md`.
+**Why:** M6 response to dense-traffic `ID_SWITCH` clusters. A hard velocity reject increased IDS (good matches dropped → coast → rematch). Soft cost + fewer low-score births addresses swap pressure without that failure mode. See `docs/findings/001-dense-id-switch-velocity-gate.md`.

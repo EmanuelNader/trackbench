@@ -266,7 +266,8 @@ TrackerConfig load_config(const std::string& path) {
   extract_number(body, "meas_var_yaw", cfg.meas_var_yaw);
   extract_number(body, "vel_gate_min_speed", cfg.vel_gate_min_speed);
   extract_number(body, "vel_gate_lateral_m", cfg.vel_gate_lateral_m);
-  extract_number(body, "vel_gate_rear_m", cfg.vel_gate_rear_m);
+  extract_number(body, "vel_cost_weight", cfg.vel_cost_weight);
+  extract_number(body, "min_birth_score", cfg.min_birth_score);
   return cfg;
 }
 

@@ -3,73 +3,63 @@
 ## What the system surfaced
 
 After ingesting nuScenes `v1.0-mini` with Megvii detections (train∪val),
-running the CV-EKF tracker, and mining failures:
+filtering to the 7 tracking classes, running the CV-EKF tracker, and mining:
 
-| kind | count (10 scenes) |
-|------|-------------------|
+| kind | count (10 scenes, pre-fix) |
+|------|-------------------------------|
 | `ID_SWITCH` | **890** |
 | `LATE_INIT` | 374 |
 | `GHOST_TRACK` | 369 |
-| `TRACK_DROP` | 92 |
-| `POS_ERROR_SPIKE` | 91 |
-| `TRACK_DEATH` | 23 |
 
-Largest clusters were **`other_id_switch` / `dense_id_switch`** on
-`scene-0655` and `scene-0916` (hundreds of events each).
+Largest clusters: **`other_id_switch` / `dense_id_switch`** on
+`scene-0655` and `scene-0916`.
 
 ## Hypothesis
 
-Association cost was **squared Mahalanobis in position only**, gated by
-class + Euclidean radius. In dense same-class traffic, a neighboring vehicle
-often falls inside the gate of the wrong track. Hungarian then swaps IDs
-even when the detection disagrees with the track’s estimated velocity.
+1. **Position-only Mahalanobis cost** lets nearby same-class objects swap IDs
+   when both fall inside a ~2 m gate.
+2. **Every unmatched detection births a track** (even middling scores), so dense
+   frames create many tentative hypotheses that steal associations next frame.
 
-Public lineage: motion-consistency / velocity gating is standard in classical
-MOT (SORT / AB3DMOT-style association refinements).
+## Experiments
 
-## Also required for a fair loop
+| attempt | result |
+|---------|--------|
+| Hard lateral/rear velocity **reject** | IDS **worse** (890 → 913). Rejected good matches → coast → rematch as switch. |
+| Soft lateral velocity **cost** + `gate_m=1.5` + `min_birth_score=0.5` | *(remeasure — this commit)* |
 
-Unfiltered Megvii outputs include barriers, cones, and low-score boxes.
-Evaluating those as tracks vs all GT boxes made MOTA unreadable. Ingest now
-keeps only the **7 nuScenes tracking classes** and detections with
-**score ≥ 0.3** (same convention as the tracking challenge class set).
+## Change (current)
 
-## Change
-
-1. **Ingest filters** — `TRACKING_CLASSES` + `DEFAULT_MIN_DET_SCORE = 0.3`
-2. **Velocity-consistency gate** in `core/src/association.cpp` (config keys
-   `vel_gate_min_speed`, `vel_gate_lateral_m`, `vel_gate_rear_m`):
-   for tracks with `hits >= 2` and speed ≥ threshold, reject associations
-   whose innovation is too far **lateral** to velocity or too far **behind**
-   the predicted position.
+1. Ingest: tracking classes only, detection score ≥ 0.3.
+2. Association: soft penalty
+   `cost += vel_cost_weight * (lat / vel_gate_lateral_m)^2` for moving tracks.
+3. Euclidean gate tightened `2.0 → 1.5` m.
+4. Birth threshold: unmatched dets with `score < 0.5` do not start tracks
+   (they can still update existing tracks if associated).
 
 ## How to remeasure
 
 ```bash
 git pull origin cursor/m0-skeleton-86da
 make core
-
 PYTHONPATH=. python -m ingest.nuscenes_ingest \
   --detections-json data/raw/detections/megvii_mini_merged.json --force
-
-# track + eval all 10 (same loops as before)
+# then track + eval all 10 scenes
 ```
 
-Compare aggregate IDS and the size of `other_id_switch` / `dense_id_switch`
-clusters on `scene-0655` / `scene-0916` before vs after.
+## Before (class-filtered baseline, hard-gate attempt discarded)
 
-## Expected tradeoff
+| scene | MOTA | IDS | FP | FN |
+|-------|------|-----|----|----|
+| scene-0655 | -0.205 | 471 | 486 | 1271 |
+| scene-0916 | -0.291 | 384 | 813 | 1304 |
+| all ID_SWITCH events | | 890 | | |
 
-Tight velocity gates can increase **FN / LATE_INIT / TRACK_DROP** when
-detections jitter or objects brake hard. Report both the IDS win and any
-MOTA/FN regression — something always moves the wrong way.
+## After
 
-## Before / after
+*(fill after local remeasure)*
 
-Fill in after local remeasure:
+## Expected tradeoffs
 
-| scene | MOTA before | IDS before | MOTA after | IDS after |
-|-------|-------------|------------|------------|-----------|
-| scene-0655 | -0.205 | 471 | | |
-| scene-0916 | -0.291 | 384 | | |
-| aggregate | | 890 ID_SWITCH events | | |
+Higher birth score and tighter gate can raise **LATE_INIT / FN**. Report IDS
+wins and FN/MOTA regressions together.

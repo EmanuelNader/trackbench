@@ -87,11 +87,15 @@ struct TrackerConfig {
   double process_var_yaw = 0.1;
   double meas_var_pos = 0.5;
   double meas_var_yaw = 0.1;
-  /// Reject associations that disagree with track velocity (dense ID-switch fix).
-  /// Only applied when speed >= vel_gate_min_speed and hits >= 2.
+  /// Soft velocity-consistency penalty (dense ID-switch fix).
+  /// When speed >= vel_gate_min_speed and hits >= 2, add
+  ///   vel_cost_weight * (lat / vel_gate_lateral_m)^2
+  /// to the Mahalanobis cost. No hard reject (hard gates raised FN/IDS).
   double vel_gate_min_speed = 1.0;   // m/s
-  double vel_gate_lateral_m = 1.0;   // max |innovation| perpendicular to v
-  double vel_gate_rear_m = 1.5;      // max distance behind predicted position
+  double vel_gate_lateral_m = 1.0;   // lateral scale for soft penalty
+  double vel_cost_weight = 4.0;      // weight on squared lateral penalty
+  /// Only birth new tracks from detections at/above this score.
+  double min_birth_score = 0.5;
 };
 
 inline const char* track_state_string(TrackState s) {

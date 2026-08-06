@@ -65,8 +65,12 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
   }
 
   // 5. Unmatched detections → new tentative tracks (in detection order).
+  // Birth only from high-confidence dets to limit dense-traffic ID churn.
   for (std::size_t j = 0; j < frame.detections.size(); ++j) {
     if (det_matched[j]) {
+      continue;
+    }
+    if (frame.detections[j].score < config_.min_birth_score) {
       continue;
     }
     tracks_.push_back(make_track_from_detection(frame.detections[j], next_id_,
