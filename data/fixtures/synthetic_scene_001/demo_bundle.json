@@ -1,0 +1,201 @@
+{
+  "clusters": [
+    {
+      "bucket": "other_id_switch",
+      "event_ids": [
+        "1:ID_SWITCH:f10:gtcar-a:tr2",
+        "2:ID_SWITCH:f10:gtcar-b:tr1"
+      ],
+      "event_indices": [
+        1,
+        2
+      ],
+      "label": "Identity switches (other)",
+      "size": 2,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "ID_SWITCH",
+        "kinds": {
+          "ID_SWITCH": 2
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 1.0,
+        "mean_range_m": 2.25,
+        "mean_severity": 1.0,
+        "n": 2,
+        "range_bin_mode": "near"
+      }
+    },
+    {
+      "bucket": "ghost_any",
+      "event_ids": [
+        "0:GHOST_TRACK:f8:gtNone:tr99"
+      ],
+      "event_indices": [
+        0
+      ],
+      "label": "Ghost tracks (unmatched confirmed/coasting)",
+      "size": 1,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "GHOST_TRACK",
+        "kinds": {
+          "GHOST_TRACK": 1
+        },
+        "mean_duration_frames": 3.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 42.0267771783657,
+        "mean_severity": 0.3,
+        "n": 1,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "other_track_drop",
+      "event_ids": [
+        "3:TRACK_DROP:f16:gtcar-a:tr2"
+      ],
+      "event_indices": [
+        3
+      ],
+      "label": "Track drops (other)",
+      "size": 1,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "TRACK_DROP",
+        "kinds": {
+          "TRACK_DROP": 1
+        },
+        "mean_duration_frames": 2.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 7.211102550927978,
+        "mean_severity": 0.2,
+        "n": 1,
+        "range_bin_mode": "near"
+      }
+    }
+  ],
+  "failures": [
+    {
+      "features": {
+        "cls": "car",
+        "duration_frames": 3,
+        "ego_speed": 0.0,
+        "neighbor_count_5m": 0,
+        "range_bin": "far",
+        "range_m": 42.0267771783657,
+        "time_of_day": "day",
+        "visibility": null,
+        "weather": "clear"
+      },
+      "frame": 8,
+      "gt_id": null,
+      "kind": "GHOST_TRACK",
+      "scene_id": "synthetic_scene_001",
+      "severity": 0.3,
+      "t": 4.0,
+      "track_id": 99
+    },
+    {
+      "features": {
+        "cls": "car",
+        "duration_frames": 1,
+        "ego_speed": 0.0,
+        "neighbor_count_5m": 1,
+        "range_bin": "near",
+        "range_m": 4.0,
+        "time_of_day": "day",
+        "visibility": 4,
+        "weather": "clear"
+      },
+      "frame": 10,
+      "gt_id": "car-a",
+      "kind": "ID_SWITCH",
+      "scene_id": "synthetic_scene_001",
+      "severity": 1.0,
+      "t": 5.0,
+      "track_id": 2
+    },
+    {
+      "features": {
+        "cls": "car",
+        "duration_frames": 1,
+        "ego_speed": 0.0,
+        "neighbor_count_5m": 1,
+        "range_bin": "near",
+        "range_m": 0.5,
+        "time_of_day": "day",
+        "visibility": 4,
+        "weather": "clear"
+      },
+      "frame": 10,
+      "gt_id": "car-b",
+      "kind": "ID_SWITCH",
+      "scene_id": "synthetic_scene_001",
+      "severity": 1.0,
+      "t": 5.0,
+      "track_id": 1
+    },
+    {
+      "features": {
+        "cls": "car",
+        "duration_frames": 2,
+        "ego_speed": 0.0,
+        "neighbor_count_5m": 0,
+        "range_bin": "near",
+        "range_m": 7.211102550927978,
+        "time_of_day": "day",
+        "visibility": 4,
+        "weather": "clear"
+      },
+      "frame": 16,
+      "gt_id": "car-a",
+      "kind": "TRACK_DROP",
+      "scene_id": "synthetic_scene_001",
+      "severity": 0.2,
+      "t": 8.0,
+      "track_id": 2
+    }
+  ],
+  "gtFile": "gt.jsonl",
+  "metrics": {
+    "fn": 6,
+    "fp": 7,
+    "frag": 1,
+    "gt_count": 40,
+    "ids": 2,
+    "mota": 0.625,
+    "motp": 0.05919249343475584
+  },
+  "run": {
+    "commitSha": "demo",
+    "configJson": {
+      "dist_threshold": 2.0,
+      "source": "fixture",
+      "tracks": "tracks_demo.jsonl"
+    },
+    "notes": "Synthetic demo run for M4 triage UI (intentionally degraded tracks).",
+    "runKey": "demo-synthetic-v1"
+  },
+  "scene": {
+    "description": "synthetic two-car crossing scene for M0 demo / CI",
+    "id": "synthetic_scene_001",
+    "name": "synthetic_scene_001",
+    "numFrames": 20,
+    "timeOfDay": "day",
+    "weather": "clear"
+  },
+  "sceneMetrics": {
+    "synthetic_scene_001": {
+      "fn": 6,
+      "fp": 7,
+      "frag": 1,
+      "gt_count": 40,
+      "ids": 2,
+      "mota": 0.625,
+      "motp": 0.05919249343475584
+    }
+  },
+  "tracksFile": "tracks_demo.jsonl",
+  "version": 1
+}
