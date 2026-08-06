@@ -241,6 +241,24 @@ std::vector<Association> associate(const std::vector<Track>& tracks,
       if (!(m2 <= cfg.gate_mahalanobis)) {
         continue;
       }
+
+      // Velocity consistency (M6): reject same-class nearby swaps when the
+      // detection disagrees with the track's motion. Applied only once the
+      // track has a usable velocity estimate.
+      const double speed = std::hypot(tr.vx, tr.vy);
+      if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed) {
+        const double ux = tr.vx / speed;
+        const double uy = tr.vy / speed;
+        const double along = ux * dx + uy * dy;
+        const double lat = std::fabs(-uy * dx + ux * dy);
+        if (lat > cfg.vel_gate_lateral_m) {
+          continue;
+        }
+        if (along < -cfg.vel_gate_rear_m) {
+          continue;
+        }
+      }
+
       cost[i][j] = m2;
     }
   }

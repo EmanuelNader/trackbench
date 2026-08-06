@@ -87,6 +87,11 @@ struct TrackerConfig {
   double process_var_yaw = 0.1;
   double meas_var_pos = 0.5;
   double meas_var_yaw = 0.1;
+  /// Reject associations that disagree with track velocity (dense ID-switch fix).
+  /// Only applied when speed >= vel_gate_min_speed and hits >= 2.
+  double vel_gate_min_speed = 1.0;   // m/s
+  double vel_gate_lateral_m = 1.0;   // max |innovation| perpendicular to v
+  double vel_gate_rear_m = 1.5;      // max distance behind predicted position
 };
 
 inline const char* track_state_string(TrackState s) {

@@ -32,6 +32,13 @@ DEFAULT_VERSION = "v1.0-mini"
 DEFAULT_DETECTIONS_JSON = "./data/raw/detections/megvii_train.json"
 FIXTURES_ROOT = Path("data/fixtures")
 
+# nuScenes tracking challenge classes (exclude barrier/cone/construction noise).
+TRACKING_CLASSES = frozenset(
+    {"bicycle", "bus", "car", "motorcycle", "pedestrian", "trailer", "truck"}
+)
+DEFAULT_MIN_DET_SCORE = 0.3
+
+
 # nuScenes visibility level string → int 1–4 (0 = unknown / missing)
 _VISIBILITY_LEVEL = {
     "v0-40": 1,
@@ -313,9 +320,12 @@ def ingest_scene(
             )
             # ann size is [w, l, h]
             l, w, h = nuscenes_size_to_lwh(ann["size"])
+            cls = _category_to_cls(ann["category_name"])
+            if cls not in TRACKING_CLASSES:
+                continue
             gt_dets.append(
                 {
-                    "cls": _category_to_cls(ann["category_name"]),
+                    "cls": cls,
                     "x": x,
                     "y": y,
                     "z": z,
@@ -332,6 +342,10 @@ def ingest_scene(
         # --- Detections from Megvii-style results ---
         frame_dets: list[Detection] = []
         for det in results.get(sample["token"], []):
+            cls = _category_to_cls(det.get("detection_name", "unknown"))
+            score = float(det.get("detection_score", 0.0))
+            if cls not in TRACKING_CLASSES or score < DEFAULT_MIN_DET_SCORE:
+                continue
             yaw_g = quat_to_yaw(det["rotation"])
             x, y, z, yaw = global_to_ego(
                 det["translation"], yaw_g, ego_t, ego_r
@@ -339,7 +353,7 @@ def ingest_scene(
             l, w, h = nuscenes_size_to_lwh(det["size"])
             frame_dets.append(
                 {
-                    "cls": _category_to_cls(det.get("detection_name", "unknown")),
+                    "cls": cls,
                     "x": x,
                     "y": y,
                     "z": z,
@@ -347,7 +361,7 @@ def ingest_scene(
                     "w": w,
                     "h": h,
                     "yaw": yaw,
-                    "score": float(det.get("detection_score", 0.0)),
+                    "score": score,
                 }
             )
 

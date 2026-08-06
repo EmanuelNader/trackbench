@@ -35,3 +35,21 @@ Recorded at M0. Rationale is public-source only.
 **Choice:** Per-scene `detections.jsonl` / `gt.jsonl` / `tracks.jsonl`. Coordinates in the **ego frame at the current timestamp**.
 
 **Why:** Spec §4. Ego motion compensation in ingest, not the tracker. Official nuScenes detection/tracking JSON is global; we transform at ingest so the C++ hot path stays simple and deterministic.
+
+## D6 — Mini detections = Megvii train ∪ val
+
+**Choice:** Merge `megvii_train.json` + `megvii_val.json` for mini ingest (`megvii_mini_merged.json`).
+
+**Why:** Mini’s 10 scenes straddle the official train/val split. Using only val (or only train) yields empty `dets` for some scenes.
+
+## D7 — Filter to tracking classes + score ≥ 0.3 at ingest
+
+**Choice:** Keep only `{bicycle, bus, car, motorcycle, pedestrian, trailer, truck}` and detection score ≥ 0.3.
+
+**Why:** Matches the nuScenes tracking class set. Raw Megvii dumps include barriers/cones/low-score junk that dominate FP and make MOTA uninterpretable. See finding `001`.
+
+## D8 — Velocity-consistency association gate
+
+**Choice:** After position Mahalanobis gating, reject associations that are laterally inconsistent with track velocity (or too far behind) for tracks with `hits >= 2` and speed ≥ 1 m/s.
+
+**Why:** M6 response to mined dense-traffic `ID_SWITCH` clusters. Position-only cost swaps IDs between nearby same-class objects. See `docs/findings/001-dense-id-switch-velocity-gate.md`.

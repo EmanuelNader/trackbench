@@ -8,5 +8,8 @@
   "process_var_vel": 1.0,
   "process_var_yaw": 0.1,
   "meas_var_pos": 0.5,
-  "meas_var_yaw": 0.1
+  "meas_var_yaw": 0.1,
+  "vel_gate_min_speed": 1.0,
+  "vel_gate_lateral_m": 1.0,
+  "vel_gate_rear_m": 1.5
 }
