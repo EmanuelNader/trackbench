@@ -28,7 +28,8 @@ SYNTHETIC_SCENE_NAME = "synthetic_scene_001"
 DEFAULT_DATAROOT = "./data/raw/nuscenes"
 DEFAULT_OUT_ROOT = "./data/normalized"
 DEFAULT_VERSION = "v1.0-mini"
-DEFAULT_DETECTIONS_JSON = "./data/raw/detections/megvii_val.json"
+# nuScenes mini sample tokens are covered by megvii_train.json, not val.
+DEFAULT_DETECTIONS_JSON = "./data/raw/detections/megvii_train.json"
 FIXTURES_ROOT = Path("data/fixtures")
 
 # nuScenes visibility level string → int 1–4 (0 = unknown / missing)
