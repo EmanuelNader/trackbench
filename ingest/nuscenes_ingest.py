@@ -197,11 +197,29 @@ def write_synthetic_scene(
     return scene_dir
 
 
+# Files produced by the tracker/eval golden path — never overwrite via ingest.
+_PRESERVE_FIXTURE_NAMES = frozenset(
+    {
+        "tracks_expected.jsonl",
+        "demo_bundle.json",
+        "demo_run.json",
+    }
+)
+
+
 def _copy_to_fixtures(scene_dir: Path) -> None:
+    """Sync ingest outputs into data/fixtures/, preserving golden/demo artifacts."""
     dest = FIXTURES_ROOT / scene_dir.name
+    preserved: dict[str, bytes] = {}
     if dest.exists():
+        for name in _PRESERVE_FIXTURE_NAMES:
+            p = dest / name
+            if p.is_file():
+                preserved[name] = p.read_bytes()
         shutil.rmtree(dest)
     shutil.copytree(scene_dir, dest)
+    for name, data in preserved.items():
+        (dest / name).write_bytes(data)
     print(f"copied fixture → {dest}")
 
 
