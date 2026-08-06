@@ -2,7 +2,7 @@
 
 A miniature AV data engine: run a tracker over logged driving data, automatically find where it fails, cluster those failures into real bugs, and gate every future change on regression.
 
-> **Status (M0):** Skeleton — C++ CLI builds, synthetic ingest produces valid JSONL, Postgres schema migrates, API health endpoint stubs exist. Tracker math lands in M1.
+> **Status (M0–M2 early):** Skeleton + working deterministic C++ tracker (EKF/Hungarian/lifecycle) + CLEAR MOT metrics. Synthetic ingest demos without the 4GB download. Failure mining / UI / CI gate still ahead.
 
 ## Quick start
 
