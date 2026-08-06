@@ -1,0 +1,51 @@
+# Data (raw + normalized logs). Keep fixtures (and root .gitkeep) tracked.
+data/*
+!data/.gitkeep
+!data/fixtures/
+!data/fixtures/**
+
+# Build artifacts
+core/build/
+**/build/
+cmake-build-*/
+*.o
+*.a
+*.so
+*.dylib
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+api/dist/
+web/dist/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Prisma
+api/prisma/*.db
+api/prisma/*.db-journal
+
+# Coverage / misc
+coverage/
+*.log
+.cache/
