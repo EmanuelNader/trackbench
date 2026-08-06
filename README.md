@@ -2,76 +2,83 @@
 
 A miniature AV data engine: run a tracker over logged driving data, automatically find where it fails, cluster those failures into real bugs, and gate every future change on regression.
 
-> **Status (M0–M4):** Skeleton + deterministic C++ tracker + CLEAR MOT + failure mining/clustering + triage UI with Canvas BEV player. Synthetic fixture demo works without the 4GB download.
+> **Status (M0–M5 early):** End-to-end loop on a synthetic fixture — ingest → deterministic C++ tracker → CLEAR MOT → failure mining → rule clusters → triage UI → CI regression gate. Real nuScenes mini + Megvii detections are wired in ingest but not required to demo. M6 finding writeup still ahead.
 
-## Quick start — triage UI demo
+## Quick start
 
 ```bash
-# 1. Infra + DB
 cp .env.example .env
-docker compose up -d          # or use local Postgres on :5432
-cd api && npm install && npx prisma migrate deploy && cd ..
 
-# 2. (Re)generate fixture demo bundle if needed
+# Tracker + tests
+make core && make core-test
+
+# Synthetic scene (no 4GB download)
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m eval.write_demo_run
-
-# 3. API + load demo run
-cd api && npm run dev         # http://localhost:3001
-curl -s http://localhost:3001/demo/bootstrap | jq
-
-# 4. Web
-cd web && npm install && npm run dev   # http://localhost:5173 (proxies /api → :3001)
-```
-
-Click **Load demo run** on the runs page if you skipped the curl, then open a scene player.
-
-## Tracker / ingest
-
-```bash
-make core
-./core/build/trackbench_run --help
-
 python -m ingest.nuscenes_ingest --synthetic --force
-cat data/normalized/synthetic_scene_001/detections.jsonl | head
+cat data/fixtures/synthetic_scene_001/detections.jsonl | head
+
+# Metrics + mine
+PYTHONPATH=. python -m eval.run_eval \
+  --gt data/fixtures/synthetic_scene_001/gt.jsonl \
+  --tracks data/fixtures/synthetic_scene_001/tracks_expected.jsonl \
+  --scene-meta data/fixtures/synthetic_scene_001/scene_meta.json \
+  --scene-id synthetic_scene_001 --mine
+
+# Regression gate
+PYTHONPATH=. python -m eval.gate
+
+# API + UI (Postgres: docker compose up -d && make migrate)
+cd api && npm ci && npx prisma migrate deploy && npm run build
+DATABASE_URL=postgresql://trackbench:trackbench@localhost:5432/trackbench?schema=public \
+  FIXTURES_ROOT=$PWD/../data/fixtures node dist/index.js &
+curl -s localhost:3001/demo/bootstrap
+cd ../web && npm ci && npm run dev
+# open http://localhost:5173
 ```
 
-For real nuScenes mini + Megvii detections, see [docs/data.md](docs/data.md).
+Real nuScenes mini + Megvii detections: [docs/data.md](docs/data.md).
+
+## Synthetic fixture metrics
+
+| metric | baseline (`tracks_expected`) | demo bundle (intentionally degraded) |
+|--------|------------------------------|--------------------------------------|
+| MOTA   | 0.90                         | 0.625                                |
+| IDS    | 0                            | 2                                    |
+| FP     | 0                            | 7                                    |
+| FN     | 4                            | 6                                    |
+
+FN=4 on the golden path is tentative-track warmup (promote at 3 hits).
 
 ## Layout
 
 ```
-core/       C++17 tracker (EKF + Hungarian + lifecycle) — stub CLI in M0
-ingest/     nuScenes → ego-frame detections.jsonl / gt.jsonl
-eval/       CLEAR MOT, failure mining, clustering, demo bundle writer
-api/        Express + Prisma (Postgres) + fixture bootstrap
-web/        React triage UI (runs / clusters / Canvas BEV player)
-data/       gitignored raw/normalized; fixtures committed for CI
-baselines/  metric floor for the regression gate (M5)
-docs/       decisions + findings
+core/       C++17 CV-EKF tracker (Hungarian + lifecycle), GoogleTest + golden
+ingest/     nuScenes → ego-frame JSONL (--synthetic for offline demo)
+eval/       CLEAR MOT, failure mining, rule clustering, CI gate
+api/        Express + Prisma
+web/        React triage UI + Canvas 2D BEV player
+data/fixtures/   committed synthetic scene + demo_bundle.json
+baselines/baseline.json   CI metric floor
+docs/decisions.md         locked design choices
+docs/findings/            M6 writeups (empty until a real bug fix)
 ```
 
-## Locked decisions (M0)
+## Locked decisions
 
-See [docs/decisions.md](docs/decisions.md):
-
-1. **Megvii (CBGS)** published detections
-2. **Mahalanobis** association (GIoU noted as alternative)
-3. **Global** tracker params first
-4. **2D BEV** state `[x, y, vx, vy, yaw]`
+See [docs/decisions.md](docs/decisions.md): Megvii detections, Mahalanobis association, global params, 2D BEV state.
 
 ## Milestones
 
-| Milestone | Deliverable |
-|-----------|-------------|
-| M0 | Skeleton, synthetic ingest, Prisma, hello binary |
-| M1 | EKF + Hungarian + lifecycle, golden byte-identical tracks |
-| M2 | CLEAR MOT → Postgres `Run` |
-| M3 | Failure mining + rule clustering |
-| **M4** (this PR) | Triage UI + Canvas BEV player + fixture demo bootstrap |
-| M5 | CI regression gate |
-| M6 | One written finding with before/after metrics |
+| Milestone | Status |
+|-----------|--------|
+| M0 Skeleton | done |
+| M1 Tracker v0 | done (golden byte-identical) |
+| M2 Metrics | done |
+| M3 Failure mining | done (rule clusters) |
+| M4 Triage UI | done (demo bootstrap) |
+| M5 CI gate | done (synthetic fixture floor) |
+| M6 Finding writeup | next — needs real mini data |
 
 ## Constraints
 

@@ -201,6 +201,7 @@ def write_synthetic_scene(
 _PRESERVE_FIXTURE_NAMES = frozenset(
     {
         "tracks_expected.jsonl",
+        "tracks_demo.jsonl",
         "demo_bundle.json",
         "demo_run.json",
     }

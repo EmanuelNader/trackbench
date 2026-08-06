@@ -1,0 +1,24 @@
+{
+  "description": "Synthetic fixture floor for CI regression gate (not nuScenes mini).",
+  "scene": "synthetic_scene_001",
+  "tracks": "data/fixtures/synthetic_scene_001/tracks_expected.jsonl",
+  "gt": "data/fixtures/synthetic_scene_001/gt.jsonl",
+  "metrics": {
+    "mota": 0.9,
+    "motp": 0.058874509992345544,
+    "ids": 0,
+    "fp": 0,
+    "fn": 4,
+    "frag": 0
+  },
+  "latency": {
+    "note": "Filled when timing.json is collected on reference hardware.",
+    "p99_ms": null,
+    "hardware": null
+  },
+  "gates": {
+    "mota_max_drop": 0.5,
+    "ids_max_increase": 0,
+    "p99_max_regression_ratio": 0.2
+  }
+}

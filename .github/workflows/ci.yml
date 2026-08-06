@@ -44,6 +44,47 @@ jobs:
       - name: Pytest
         run: pytest tests/ -q
 
+  eval-gate:
+    runs-on: ubuntu-latest
+    needs: [core, python]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build deps
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libeigen3-dev
+      - name: Install light Python deps
+        run: pip install numpy pyquaternion pytest python-dotenv
+      - name: Build tracker
+        run: |
+          cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release -DTRACKBENCH_BUILD_TESTS=OFF
+          cmake --build core/build -j$(nproc)
+      - name: Run tracker on fixture subset
+        run: |
+          ./core/build/trackbench_run \
+            --dets data/fixtures/synthetic_scene_001/detections.jsonl \
+            --config core/config/default.json \
+            --out /tmp/tracks_ci.jsonl \
+            --timing /tmp/timing_ci.json
+      - name: Regression gate vs baselines/baseline.json
+        run: |
+          PYTHONPATH=. python -m eval.gate \
+            --baseline baselines/baseline.json \
+            --tracks /tmp/tracks_ci.jsonl \
+            --timing /tmp/timing_ci.json
+      - name: Post metric diff
+        if: always()
+        run: |
+          PYTHONPATH=. python -m eval.gate \
+            --baseline baselines/baseline.json \
+            --tracks /tmp/tracks_ci.jsonl \
+            --timing /tmp/timing_ci.json > /tmp/gate.json || true
+          echo '### trackbench regression gate' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/gate.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
   api:
     runs-on: ubuntu-latest
     services:
