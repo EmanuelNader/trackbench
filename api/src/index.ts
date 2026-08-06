@@ -62,13 +62,15 @@ app.get("/runs", async (_req, res) => {
     orderBy: { createdAt: "desc" },
     include: {
       metrics: true,
-      _count: { select: { failureEvents: true, sceneMetrics: true } },
+      sceneMetrics: { select: { sceneId: true } },
+      _count: { select: { failureEvents: true } },
     },
   });
 
   res.json(
     runs.map((run) => {
       const m = metricsMap(run.metrics);
+      const nScenes = new Set(run.sceneMetrics.map((s) => s.sceneId)).size;
       return {
         id: run.id,
         runKey: run.runKey,
@@ -83,7 +85,7 @@ app.get("/runs", async (_req, res) => {
         frag: m.frag ?? null,
         metrics: m,
         nFailures: run._count.failureEvents,
-        nScenes: run._count.sceneMetrics,
+        nScenes,
       };
     }),
   );

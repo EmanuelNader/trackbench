@@ -27,6 +27,7 @@ model Run {
   metrics       RunMetric[]
   sceneMetrics  SceneMetric[]
   failureEvents FailureEvent[]
+  clusters      Cluster[]
 
   @@index([commitSha])
   @@unique([runKey])
@@ -81,6 +82,7 @@ model Cluster {
   label        String?
   size         Int
   centroidJson Json
+  run          Run            @relation(fields: [runId], references: [id], onDelete: Cascade)
   events       FailureEvent[]
 
   @@index([runId])
