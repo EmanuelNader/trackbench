@@ -20,9 +20,30 @@ wget -O data/raw/detections/detection-megvii.zip https://www.nuscenes.org/data/d
 unzip -d data/raw/detections data/raw/detections/detection-megvii.zip
 ```
 
-Use `megvii_val.json` (and/or train). Ingest filters to mini `sample_token`s.
-
 Cite: Zhu et al. arXiv:1908.09492; listed in nuscenes-devkit tracking baselines.
+
+### Merge train ∪ val for mini (`megvii_mini_merged.json`)
+
+Mini’s 10 scenes straddle the official train/val split. Using only one file leaves some scenes with empty dets (see [decisions.md](decisions.md) D6). Merge:
+
+```bash
+python3 -c "
+import json
+from pathlib import Path
+d = Path('data/raw/detections')
+t, v = (json.load(open(d/f)) for f in ('megvii_train.json', 'megvii_val.json'))
+out = {'meta_data': t.get('meta_data', v.get('meta_data', {})),
+       'results': {**t['results'], **v['results']}}
+json.dump(out, open(d/'megvii_mini_merged.json', 'w'))
+print(len(out['results']), 'sample tokens')
+"
+```
+
+Point ingest at the merge (already the default in `.env.example`):
+
+```bash
+export DETECTIONS_JSON=./data/raw/detections/megvii_mini_merged.json
+```
 
 ## Normalize
 
@@ -33,6 +54,8 @@ pip install -r requirements.txt
 python -m ingest.nuscenes_ingest --limit 1
 cat data/normalized/*/detections.jsonl | head
 ```
+
+Ingest keeps tracking classes only and drops dets with score < 0.3 (D7).
 
 ## Fixtures
 
