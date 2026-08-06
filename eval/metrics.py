@@ -225,7 +225,8 @@ def _match_frame(
     matched_gt: set[int] = set()
     matched_tr: set[int] = set()
     matches: list[tuple[str, int, float]] = []
-    for r, c in zip(row_ind.tolist(), col_ind.tolist(), strict=True):
+    # Note: no zip(..., strict=True) — keep Python 3.9 compatible (macOS system py).
+    for r, c in zip(row_ind.tolist(), col_ind.tolist()):
         d = float(dist[r, c])
         if d <= dist_threshold:
             matches.append((gt_ids[r], track_ids[c], d))
