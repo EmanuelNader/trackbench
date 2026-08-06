@@ -41,11 +41,15 @@ core-test:
 ingest-one:
 	python3 -m ingest.nuscenes_ingest --limit 1
 
-demo: up migrate core
+demo: core
 	@echo ""
-	@echo "Postgres is up. Prisma migrated. C++ binary built."
-	@echo "Next: download nuScenes mini + Megvii detections (see docs/data.md),"
-	@echo "then: make ingest-one && cat data/normalized/<scene>/detections.jsonl | head"
+	@python3 -m ingest.nuscenes_ingest --synthetic --force
+	@echo ""
+	@echo "=== sample detections ==="
+	@head -n 1 data/normalized/synthetic_scene_001/detections.jsonl
+	@echo ""
+	@echo "Postgres: make up && make migrate   (requires Docker)"
+	@echo "Real data: see docs/data.md"
 
 lint:
 	@echo "noop for M0"
