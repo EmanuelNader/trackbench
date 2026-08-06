@@ -1,0 +1,11 @@
+{
+  "name": "trackbench-web",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"web scaffold placeholder — Vite app TBD\"",
+    "build": "echo \"web scaffold placeholder — Vite app TBD\"",
+    "preview": "echo \"web scaffold placeholder — Vite app TBD\""
+  }
+}
