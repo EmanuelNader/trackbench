@@ -1,5 +1,7 @@
 #include "trackbench/tracker.hpp"
 
+#include <utility>
+
 namespace trackbench {
 
 Tracker::Tracker(TrackerConfig config) : config_(std::move(config)) {}
