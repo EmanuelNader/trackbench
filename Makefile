@@ -1,13 +1,15 @@
-.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint
+.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap
 
 help:
 	@echo "trackbench targets:"
-	@echo "  make up           - start Postgres (docker-compose)"
-	@echo "  make migrate      - apply Prisma schema"
-	@echo "  make core         - build C++ tracker (Release)"
-	@echo "  make core-test    - build + run GoogleTest"
-	@echo "  make ingest-one   - ingest first mini scene (requires data)"
-	@echo "  make demo         - up + migrate + core + print next steps"
+	@echo "  make up             - start Postgres (docker-compose)"
+	@echo "  make migrate        - apply Prisma schema"
+	@echo "  make core           - build C++ tracker (Release)"
+	@echo "  make core-test      - build + run GoogleTest"
+	@echo "  make ingest-one     - ingest first mini scene (requires data)"
+	@echo "  make demo-bundle    - regenerate fixture demo_bundle.json"
+	@echo "  make demo-bootstrap - migrate + load demo run into Postgres"
+	@echo "  make demo           - up + migrate + core + print next steps"
 
 up:
 	docker compose up -d
@@ -28,6 +30,12 @@ api-install:
 
 web-install:
 	cd web && npm install
+
+demo-bundle:
+	python3 -m eval.write_demo_run
+
+demo-bootstrap: migrate
+	cd api && npx tsx -e 'import { PrismaClient } from "@prisma/client"; import { bootstrapDemo } from "./src/demo.ts"; const p=new PrismaClient(); bootstrapDemo(p).then(r=>{console.log(JSON.stringify(r,null,2)); return p.$$disconnect();}).catch(e=>{console.error(e); process.exit(1);})'
 
 core:
 	cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release
