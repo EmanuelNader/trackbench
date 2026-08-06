@@ -37,13 +37,16 @@ demo-bundle:
 demo-bootstrap: migrate
 	cd api && npx tsx -e 'import { PrismaClient } from "@prisma/client"; import { bootstrapDemo } from "./src/demo.ts"; const p=new PrismaClient(); bootstrapDemo(p).then(r=>{console.log(JSON.stringify(r,null,2)); return p.$$disconnect();}).catch(e=>{console.error(e); process.exit(1);})'
 
+# macOS has no nproc; fall back to sysctl / nproc / 4
+NPROC := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+
 core:
 	cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release
-	cmake --build core/build -j$$(nproc)
+	cmake --build core/build -j$(NPROC)
 
 core-test:
 	cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Debug -DTRACKBENCH_BUILD_TESTS=ON
-	cmake --build core/build -j$$(nproc)
+	cmake --build core/build -j$(NPROC)
 	cd core/build && ctest --output-on-failure
 
 ingest-one:
