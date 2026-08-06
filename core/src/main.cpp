@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -14,14 +15,13 @@ void print_usage(const char* argv0) {
       << "Usage: " << argv0
       << " --dets path --config path --out path --timing path\n"
       << "\n"
-      << "M0 tracker CLI: read detections.jsonl, write empty tracks.jsonl\n"
-      << "(same frame/t) and a stub timing.json. Exit 0 on success.\n"
+      << "Run the deterministic EKF multi-object tracker on detections.jsonl.\n"
       << "\n"
       << "Options:\n"
       << "  --dets PATH     Input detections JSONL\n"
       << "  --config PATH   Tracker config JSON\n"
       << "  --out PATH      Output tracks JSONL\n"
-      << "  --timing PATH   Output timing JSON\n"
+      << "  --timing PATH   Output timing JSON (per-frame wall ms)\n"
       << "  --help          Show this help\n";
 }
 
@@ -78,18 +78,29 @@ int main(int argc, char** argv) {
     try {
       frames = trackbench::read_detections_jsonl(dets_path);
     } catch (const std::exception&) {
-      // Missing/unreadable dets: still produce empty valid outputs.
       frames.clear();
     }
 
     std::vector<trackbench::FrameTracks> outs;
+    std::vector<double> ms_per_frame;
     outs.reserve(frames.size());
+    ms_per_frame.reserve(frames.size());
+
+    const auto t0 = std::chrono::steady_clock::now();
     for (const auto& fd : frames) {
+      const auto f0 = std::chrono::steady_clock::now();
       outs.push_back(tracker.step(fd));
+      const auto f1 = std::chrono::steady_clock::now();
+      const double ms =
+          std::chrono::duration<double, std::milli>(f1 - f0).count();
+      ms_per_frame.push_back(ms);
     }
+    const auto t1 = std::chrono::steady_clock::now();
+    const double total_ms =
+        std::chrono::duration<double, std::milli>(t1 - t0).count();
 
     trackbench::write_tracks_jsonl(out_path, outs);
-    trackbench::write_timing_json(timing_path, outs.size());
+    trackbench::write_timing_json(timing_path, total_ms, ms_per_frame);
   } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n";
     return 1;

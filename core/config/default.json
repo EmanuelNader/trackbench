@@ -2,5 +2,11 @@
   "promote_hits": 3,
   "coast_frames": 5,
   "gate_m": 2.0,
-  "seed": 0
+  "gate_mahalanobis": 9.21,
+  "seed": 0,
+  "process_var_pos": 1.0,
+  "process_var_vel": 1.0,
+  "process_var_yaw": 0.1,
+  "meas_var_pos": 0.5,
+  "meas_var_yaw": 0.1
 }

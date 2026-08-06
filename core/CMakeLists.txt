@@ -61,13 +61,27 @@ if(TRACKBENCH_BUILD_TESTS)
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(googletest)
 
+  set(TRACKBENCH_FIXTURE_DIR
+      "${CMAKE_SOURCE_DIR}/../data/fixtures/synthetic_scene_001")
+  set(TRACKBENCH_CONFIG_PATH "${CMAKE_SOURCE_DIR}/config/default.json")
+
   add_executable(trackbench_tests
     tests/test_smoke.cpp
+    tests/test_ekf.cpp
+    tests/test_hungarian.cpp
+    tests/test_lifecycle.cpp
+    tests/test_crossing.cpp
+    tests/test_golden.cpp
   )
   target_link_libraries(trackbench_tests
     PRIVATE
       trackbench
       GTest::gtest_main
   )
-  add_test(NAME trackbench_smoke COMMAND trackbench_tests)
+  target_compile_definitions(trackbench_tests
+    PRIVATE
+      TRACKBENCH_FIXTURE_DIR="${TRACKBENCH_FIXTURE_DIR}"
+      TRACKBENCH_CONFIG_PATH="${TRACKBENCH_CONFIG_PATH}"
+  )
+  add_test(NAME trackbench_unit COMMAND trackbench_tests)
 endif()
