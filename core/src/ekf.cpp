@@ -75,6 +75,12 @@ void Ekf::update(Track& track, const Detection& det) const {
   track.P = 0.5 * (track.P + track.P.transpose());
 
   track.cls = det.cls;
+  if (det.l > 0.0) {
+    track.l = det.l;
+  }
+  if (det.w > 0.0) {
+    track.w = det.w;
+  }
   track.cov_trace = track.P.trace();
 }
 

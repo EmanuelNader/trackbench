@@ -46,6 +46,9 @@ struct Track {
   double yaw = 0.0;
   double vx = 0.0;
   double vy = 0.0;
+  /// BEV box size from last associated detection (0 ⇒ class default in IoU).
+  double l = 0.0;
+  double w = 0.0;
   TrackState state = TrackState::TENTATIVE;
   int age = 0;
   double cov_trace = 0.0;
@@ -94,6 +97,8 @@ struct TrackerConfig {
   double vel_gate_min_speed = 1.0;   // m/s
   double vel_gate_lateral_m = 1.0;   // lateral scale for soft penalty
   double vel_cost_weight = 4.0;      // weight on squared lateral penalty
+  /// Soft BEV IoU term: add iou_weight * (1 - bev_iou) inside the gate.
+  double iou_weight = 2.0;
   /// Only birth new tracks from detections at/above this score.
   double min_birth_score = 0.5;
 };

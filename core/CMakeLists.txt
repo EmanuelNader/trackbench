@@ -72,6 +72,7 @@ if(TRACKBENCH_BUILD_TESTS)
     tests/test_lifecycle.cpp
     tests/test_crossing.cpp
     tests/test_velocity_gate.cpp
+    tests/test_bev_iou.cpp
     tests/test_golden.cpp
   )
   target_link_libraries(trackbench_tests

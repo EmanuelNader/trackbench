@@ -14,6 +14,8 @@ Track make_track_from_detection(const Detection& det, int64_t id,
   t.yaw = det.yaw;
   t.vx = 0.0;
   t.vy = 0.0;
+  t.l = det.l;
+  t.w = det.w;
   t.state = TrackState::TENTATIVE;
   t.age = 1;
   t.hits = 1;

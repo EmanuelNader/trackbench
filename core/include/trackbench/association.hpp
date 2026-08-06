@@ -20,9 +20,19 @@ constexpr double kCostInf = 1e9;
 /// lower column index (callers should order rows by track id).
 std::vector<int> hungarian_minimize(const std::vector<std::vector<double>>& cost);
 
+/// BEV IoU of two oriented boxes (center x,y; length l; width w; yaw).
+/// Returns a value in [0, 1]. Degenerate (non-positive) sizes yield 0.
+double bev_oriented_iou(double x1, double y1, double l1, double w1, double yaw1,
+                        double x2, double y2, double l2, double w2, double yaw2);
+
+/// Resolve BEV box size: use stored l/w when positive, else class defaults
+/// (pedestrian → 0.8×0.6; bicycle/motorcycle → 1.8×0.6; else 4.5×1.8).
+void resolve_box_size(const std::string& cls, double& l, double& w);
+
 /// Associate tracks to detections.
-/// Cost = squared Mahalanobis in position (+ soft lateral-velocity penalty);
-/// INF outside gate. Gate: class match AND Euclidean <= gate_m AND
+/// Cost = squared Mahalanobis + soft lateral-velocity penalty
+///        + iou_weight * (1 - bev_iou); INF outside gate.
+/// Gate: class match AND Euclidean <= gate_m AND
 /// squared Mahalanobis <= gate_mahalanobis.
 /// Determinism: tracks are matched in caller order; ties broken by
 /// (track id via row order, detection index).

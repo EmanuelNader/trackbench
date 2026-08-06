@@ -88,9 +88,9 @@ Details: [docs/data.md](docs/data.md), [docs/mini-ui.md](docs/mini-ui.md).
 
 ## What I'd do next
 
-1. **LATE_INIT / FN still high** after the birth-score tradeoff — delayed starts and missed associations remain the dominant residual errors on dense scenes.
-2. **Global params only** — one `gate_m` / process-noise set for all classes; per-class coast and birth thresholds next.
-3. **No appearance / IoU term** — association is still classical (Mahalanobis + soft velocity); BEV IoU for near-parallel traffic is the obvious next cost term.
+1. **Remeasure finding [002](docs/findings/002-bev-iou-association.md)** — BEV IoU association cost shipped; fill before/after IDS on mini (`scene-0655` / `scene-0916`).
+2. **LATE_INIT / FN still high** after the birth-score tradeoff — delayed starts and missed associations remain the dominant residual errors on dense scenes.
+3. **Global params only** — one `gate_m` / process-noise set for all classes; per-class coast, birth, and `iou_weight` next.
 
 ## Layout
 

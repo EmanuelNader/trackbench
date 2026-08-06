@@ -18,6 +18,7 @@ TEST(VelocityGate, PrefersLongitudinalOverLateralNeighbor) {
   cfg.vel_gate_min_speed = 1.0;
   cfg.vel_gate_lateral_m = 1.0;
   cfg.vel_cost_weight = 4.0;
+  cfg.iou_weight = 0.0;
   Ekf ekf(cfg);
 
   Track tr;
@@ -55,6 +56,7 @@ TEST(VelocityGate, StillAssociatesWhenOnlyLateralCandidate) {
   cfg.vel_gate_min_speed = 1.0;
   cfg.vel_gate_lateral_m = 1.0;
   cfg.vel_cost_weight = 4.0;
+  cfg.iou_weight = 0.0;
   Ekf ekf(cfg);
 
   Track tr;
