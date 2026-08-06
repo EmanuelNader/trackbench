@@ -10,8 +10,29 @@ export function fixturesRoot(): string {
   return path.resolve(process.cwd(), "../data/fixtures");
 }
 
+export function normalizedRoot(): string {
+  const env = process.env.NORMALIZED_ROOT;
+  if (env && env.trim()) {
+    return path.resolve(env.trim());
+  }
+  return path.resolve(process.cwd(), "../data/normalized");
+}
+
+export function tracksRoot(): string {
+  const env = process.env.TRACKS_ROOT;
+  if (env && env.trim()) {
+    return path.resolve(env.trim());
+  }
+  return path.resolve(process.cwd(), "../data/tracks");
+}
+
 export function sceneDir(sceneId: string): string {
-  return path.join(fixturesRoot(), sceneId);
+  // Prefer fixtures (demo), then normalized mini scenes.
+  const fixture = path.join(fixturesRoot(), sceneId);
+  if (fs.existsSync(fixture)) {
+    return fixture;
+  }
+  return path.join(normalizedRoot(), sceneId);
 }
 
 export function readJsonFile<T>(filePath: string): T {
@@ -33,11 +54,17 @@ export function loadJsonl(filePath: string): Record<string, unknown>[] {
   return rows;
 }
 
-/** Prefer tracks_demo.jsonl, then tracks.jsonl, then tracks_expected.jsonl. */
-export function resolveTracksPath(dir: string): string | null {
+/**
+ * Resolve tracks JSONL for a scene.
+ * Order: in-scene demo/tracks files, then TRACKS_ROOT/<scene>.jsonl.
+ */
+export function resolveTracksPath(dir: string, sceneId?: string): string | null {
   for (const name of ["tracks_demo.jsonl", "tracks.jsonl", "tracks_expected.jsonl"]) {
     const candidate = path.join(dir, name);
     if (fs.existsSync(candidate)) return candidate;
   }
+  const id = sceneId || path.basename(dir);
+  const external = path.join(tracksRoot(), `${id}.jsonl`);
+  if (fs.existsSync(external)) return external;
   return null;
 }

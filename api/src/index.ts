@@ -231,10 +231,10 @@ app.get("/scenes/:id/frames/:frame", async (req, res) => {
 
   const dir = sceneDir(sceneId);
   const gtPath = path.join(dir, "gt.jsonl");
-  const tracksPath = resolveTracksPath(dir);
+  const tracksPath = resolveTracksPath(dir, sceneId);
   if (!tracksPath) {
     res.status(404).json({
-      error: `no tracks jsonl under ${dir}`,
+      error: `no tracks jsonl for ${sceneId} (checked ${dir} and TRACKS_ROOT)`,
     });
     return;
   }

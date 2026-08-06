@@ -68,7 +68,19 @@ cd ../web && npm ci && npm run dev
 
 ### Real mini
 
-Download nuScenes mini + Megvii detections, merge train∪val into `megvii_mini_merged.json`, then ingest. Steps and one-liner: [docs/data.md](docs/data.md).
+Download nuScenes mini + Megvii detections, merge train∪val, ingest, track, eval:
+
+```bash
+python scripts/merge_megvii_mini.py
+PYTHONPATH=. python -m ingest.nuscenes_ingest --force
+./scripts/eval_all_scenes.sh
+
+# Load into triage UI (Postgres)
+PYTHONPATH=. python -m eval.write_run --mine --write-db --notes "mini M6"
+# see docs/mini-ui.md for NORMALIZED_ROOT / TRACKS_ROOT when starting the API
+```
+
+Details: [docs/data.md](docs/data.md), [docs/mini-ui.md](docs/mini-ui.md).
 
 ## Latency
 
