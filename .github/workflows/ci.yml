@@ -73,6 +73,47 @@ jobs:
             --baseline baselines/baseline.json \
             --tracks /tmp/tracks_ci.jsonl \
             --timing /tmp/timing_ci.json
+      - name: Mine synthetic fixture
+        run: |
+          PYTHONPATH=. python -m eval.run_eval \
+            --gt data/fixtures/synthetic_scene_001/gt.jsonl \
+            --tracks data/fixtures/synthetic_scene_001/tracks_expected.jsonl \
+            --scene-meta data/fixtures/synthetic_scene_001/scene_meta.json \
+            --scene-id synthetic_scene_001 \
+            --mine \
+            --out /tmp/fixture_metrics.json \
+            > /tmp/fixture_eval_stdout.txt
+          PYTHONPATH=. python <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          metrics = json.loads(Path("/tmp/fixture_metrics.json").read_text(encoding="utf-8"))
+          text = Path("/tmp/fixture_eval_stdout.txt").read_text(encoding="utf-8")
+          decoder = json.JSONDecoder()
+          idx = 0
+          objs = []
+          while idx < len(text):
+              while idx < len(text) and text[idx].isspace():
+                  idx += 1
+              if idx >= len(text):
+                  break
+              obj, end = decoder.raw_decode(text, idx)
+              objs.append(obj)
+              idx = end
+          mine = next((o for o in objs if isinstance(o, dict) and "n_failures" in o), {})
+          summary = (
+              "### Synthetic fixture eval (mine)\n\n"
+              "| metric | value |\n"
+              "|--------|-------|\n"
+              f"| MOTA | {metrics.get('mota')} |\n"
+              f"| IDS | {metrics.get('ids')} |\n"
+              f"| n_failures | {mine.get('n_failures', 0)} |\n"
+          )
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
+              fh.write(summary)
+          PY
       - name: Post metric diff
         if: always()
         run: |

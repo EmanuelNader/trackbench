@@ -24,19 +24,11 @@ Cite: Zhu et al. arXiv:1908.09492; listed in nuscenes-devkit tracking baselines.
 
 ### Merge train ∪ val for mini (`megvii_mini_merged.json`)
 
-Mini’s 10 scenes straddle the official train/val split. Using only one file leaves some scenes with empty dets (see [decisions.md](decisions.md) D6). Merge:
+Mini’s 10 scenes straddle the official train/val split. Using only one file leaves some scenes with empty dets (see [decisions.md](decisions.md) D6). Merge with the committed helper:
 
 ```bash
-python3 -c "
-import json
-from pathlib import Path
-d = Path('data/raw/detections')
-t, v = (json.load(open(d/f)) for f in ('megvii_train.json', 'megvii_val.json'))
-out = {'meta_data': t.get('meta_data', v.get('meta_data', {})),
-       'results': {**t['results'], **v['results']}}
-json.dump(out, open(d/'megvii_mini_merged.json', 'w'))
-print(len(out['results']), 'sample tokens')
-"
+python scripts/merge_megvii_mini.py
+# → data/raw/detections/megvii_mini_merged.json
 ```
 
 Point ingest at the merge (already the default in `.env.example`):
@@ -60,3 +52,14 @@ Ingest keeps tracking classes only and drops dets with score < 0.3 (D7).
 ## Fixtures
 
 `data/fixtures/` holds tiny synthetic / checked-in JSONL for CI and unit tests. Do not commit the full mini set.
+
+## Eval all normalized scenes
+
+After ingest (+ `make core`):
+
+```bash
+./scripts/eval_all_scenes.sh
+# writes data/tracks/<scene>_eval.json and prints mota / ids / n_failures
+```
+
+Synthetic smoke (no download): `make eval-fixture`.

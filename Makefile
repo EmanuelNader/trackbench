@@ -1,4 +1,4 @@
-.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap
+.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap eval-fixture demo-ui
 
 help:
 	@echo "trackbench targets:"
@@ -7,8 +7,10 @@ help:
 	@echo "  make core           - build C++ tracker (Release)"
 	@echo "  make core-test      - build + run GoogleTest"
 	@echo "  make ingest-one     - ingest first mini scene (requires data)"
+	@echo "  make eval-fixture   - CLEAR MOT + mine + gate on synthetic golden tracks"
 	@echo "  make demo-bundle    - regenerate fixture demo_bundle.json"
 	@echo "  make demo-bootstrap - migrate + load demo run into Postgres"
+	@echo "  make demo-ui        - print curl bootstrap + web dev commands"
 	@echo "  make demo           - up + migrate + core + print next steps"
 
 up:
@@ -52,6 +54,32 @@ core-test:
 ingest-one:
 	python3 -m ingest.nuscenes_ingest --limit 1
 
+eval-fixture:
+	PYTHONPATH=. python3 -m eval.run_eval \
+		--gt data/fixtures/synthetic_scene_001/gt.jsonl \
+		--tracks data/fixtures/synthetic_scene_001/tracks_expected.jsonl \
+		--scene-meta data/fixtures/synthetic_scene_001/scene_meta.json \
+		--scene-id synthetic_scene_001 \
+		--mine
+	PYTHONPATH=. python3 -m eval.gate
+
+demo-ui:
+	@echo ""
+	@echo "=== trackbench triage UI ==="
+	@echo "Prereqs: make up && make migrate   (Postgres)"
+	@echo ""
+	@echo "# API (from repo root)"
+	@echo "cd api && npm ci && npx prisma migrate deploy && npm run build"
+	@echo "DATABASE_URL=postgresql://trackbench:trackbench@localhost:5432/trackbench?schema=public \\"
+	@echo "  FIXTURES_ROOT=\$$PWD/../data/fixtures node dist/index.js &"
+	@echo "curl -s localhost:3001/demo/bootstrap"
+	@echo "# or: make demo-bootstrap"
+	@echo ""
+	@echo "# Web"
+	@echo "cd web && npm ci && npm run dev"
+	@echo "# open http://localhost:5173"
+	@echo ""
+
 demo: core
 	@echo ""
 	@python3 -m ingest.nuscenes_ingest --synthetic --force
@@ -60,6 +88,8 @@ demo: core
 	@head -n 1 data/normalized/synthetic_scene_001/detections.jsonl
 	@echo ""
 	@echo "Postgres: make up && make migrate   (requires Docker)"
+	@echo "Eval fixture: make eval-fixture"
+	@echo "Triage UI: make demo-ui"
 	@echo "Real data: see docs/data.md"
 
 lint:
