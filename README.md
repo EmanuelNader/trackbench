@@ -11,6 +11,22 @@ Run a deterministic CV-EKF tracker on logged driving data, mine failures, cluste
 
 <p align="center"><em>Triage UI — <code>scene-0655</code>, selected <code>ID_SWITCH</code> with was→now explain panel.</em></p>
 
+## What this is
+
+**Detection** answers “what objects are in this frame?”  
+**Tracking** answers “which of those is the *same* object over time?”
+
+trackbench focuses on tracking. It does **not** train a neural detector. Instead it consumes **[Megvii / CBGS](https://www.nuscenes.org/data/detection-megvii.zip)** — a public set of precomputed 3D boxes released as an official nuScenes tracking baseline — and associates them across frames with a classical CV-EKF tracker.
+
+| Piece | Role |
+|-------|------|
+| **nuScenes `v1.0-mini`** | ~10 public driving scenes + ground-truth boxes |
+| **Megvii detections** | Precomputed boxes + scores (the tracker’s inputs) |
+| **Ingest** | Filters to tracking classes (score ≥ 0.3), merges Megvii train∪val for mini, writes ego-frame JSONL |
+| **Tracker / eval / UI** | Build IDs over time, score CLEAR MOT, mine failures, triage in BEV |
+
+Why Megvii: public zip, stable schema, no detector training (project anti-goal). Details: [docs/data.md](docs/data.md), [docs/decisions.md](docs/decisions.md) (D1).
+
 ## Metrics (nuScenes `v1.0-mini`)
 
 Megvii train∪val detections, 7 tracking classes, det score ≥ 0.3.
