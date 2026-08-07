@@ -1,0 +1,21 @@
+{
+  "hardware": {
+    "machine": "x86_64",
+    "processor": "Intel Xeon (cloud CI-like VM)",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
+    "note": "Measured 2026-08-07 via scripts/bench_latency.py (second warm run)"
+  },
+  "workload": {
+    "frames": 100,
+    "dets_per_frame": 40,
+    "note": "synthetic dense association load; not a MOT accuracy bench"
+  },
+  "timing_ms": {
+    "total_ms": 3.193955,
+    "mean": 0.0319,
+    "p50": 0.0317,
+    "p95": 0.0335,
+    "p99": 0.0467,
+    "max": 0.0523
+  }
+}

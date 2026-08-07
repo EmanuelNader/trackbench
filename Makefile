@@ -1,4 +1,4 @@
-.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap eval-fixture demo-ui
+.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap eval-fixture demo-ui bench-latency
 
 help:
 	@echo "trackbench targets:"
@@ -8,6 +8,7 @@ help:
 	@echo "  make core-test      - build + run GoogleTest"
 	@echo "  make ingest-one     - ingest first mini scene (requires data)"
 	@echo "  make eval-fixture   - CLEAR MOT + mine + gate on synthetic golden tracks"
+	@echo "  make bench-latency  - dense synthetic timing (p50/p99 wall ms)"
 	@echo "  make demo-bundle    - regenerate fixture demo_bundle.json"
 	@echo "  make demo-bootstrap - migrate + load demo run into Postgres"
 	@echo "  make demo-ui        - print curl bootstrap + web dev commands"
@@ -54,6 +55,9 @@ core-test:
 	cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Debug -DTRACKBENCH_BUILD_TESTS=ON
 	cmake --build core/build -j$(NPROC)
 	cd core/build && ctest --output-on-failure
+
+bench-latency: core
+	python3 scripts/bench_latency.py --frames 100 --dets-per-frame 40
 
 ingest-one:
 	python3 -m ingest.nuscenes_ingest --limit 1
