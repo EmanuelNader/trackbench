@@ -13,5 +13,5 @@
   "vel_gate_lateral_m": 1.0,
   "vel_cost_weight": 4.0,
   "iou_weight": 2.0,
-  "min_birth_score": 0.5
+  "min_birth_score": 0.7
 }

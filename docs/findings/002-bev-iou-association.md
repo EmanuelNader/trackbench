@@ -72,7 +72,6 @@ tracks). We do **not** claim an IDS win in the README metrics table.
 
 ## What I'd do next
 
-1. **Ablation:** `iou_weight` ∈ {0, 2, 8, 20} on 0655/0916 only.
-2. **Per-class birth/coast** — pedestrians vs cars (LATE_INIT / FN residual).
-3. **Harder birth:** raise `min_birth_score` or require N gated hits with
-   score product — attack ID churn from low-quality births.
+1. ~~Harder birth~~ — done in [003](003-harder-birth-score.md); **IDS 619 → 415**.
+2. Per-class birth/coast — pedestrians vs cars (LATE_INIT / FN residual).
+3. Optional IoU weight ablation on 0655/0916 only (not default without evidence).
