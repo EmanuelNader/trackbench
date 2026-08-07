@@ -1,0 +1,2 @@
+-- AddForeignKey
+ALTER TABLE "Cluster" ADD CONSTRAINT "Cluster_runId_fkey" FOREIGN KEY ("runId") REFERENCES "Run"("id") ON DELETE CASCADE ON UPDATE CASCADE;

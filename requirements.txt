@@ -1,0 +1,10 @@
+# Light deps — enough for synthetic ingest + unit tests (CI / M0 demo)
+# CLEAR MOT in eval/metrics.py uses a pure-Python/numpy Hungarian; scipy is
+# not required for metrics (it remains in requirements-full.txt for other tools).
+numpy>=1.24,<3
+pyquaternion>=0.9.9
+pytest>=7.4
+python-dotenv>=1.0
+
+# Full eval stack (install when running real nuScenes + clustering)
+#   pip install -r requirements-full.txt

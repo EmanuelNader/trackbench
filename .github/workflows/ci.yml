@@ -1,0 +1,164 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build deps
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libeigen3-dev
+      - name: Configure & build
+        run: |
+          cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release -DTRACKBENCH_BUILD_TESTS=ON
+          cmake --build core/build -j$(nproc)
+      - name: Test
+        run: cd core/build && ctest --output-on-failure
+      - name: Determinism smoke
+        run: |
+          ./core/build/trackbench_run \
+            --dets data/fixtures/synthetic_scene_001/detections.jsonl \
+            --config core/config/default.json \
+            --out /tmp/tracks_a.jsonl \
+            --timing /tmp/timing_a.json
+          ./core/build/trackbench_run \
+            --dets data/fixtures/synthetic_scene_001/detections.jsonl \
+            --config core/config/default.json \
+            --out /tmp/tracks_b.jsonl \
+            --timing /tmp/timing_b.json
+          diff -u /tmp/tracks_a.jsonl /tmp/tracks_b.jsonl
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install light deps
+        run: pip install numpy pyquaternion pytest python-dotenv
+      - name: Pytest
+        run: pytest tests/ -q
+
+  eval-gate:
+    runs-on: ubuntu-latest
+    needs: [core, python]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build deps
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libeigen3-dev
+      - name: Install light Python deps
+        run: pip install numpy pyquaternion pytest python-dotenv
+      - name: Build tracker
+        run: |
+          cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release -DTRACKBENCH_BUILD_TESTS=OFF
+          cmake --build core/build -j$(nproc)
+      - name: Run tracker on fixture subset
+        run: |
+          ./core/build/trackbench_run \
+            --dets data/fixtures/synthetic_scene_001/detections.jsonl \
+            --config core/config/default.json \
+            --out /tmp/tracks_ci.jsonl \
+            --timing /tmp/timing_ci.json
+      - name: Regression gate vs baselines/baseline.json
+        run: |
+          PYTHONPATH=. python -m eval.gate \
+            --baseline baselines/baseline.json \
+            --tracks /tmp/tracks_ci.jsonl \
+            --timing /tmp/timing_ci.json
+      - name: Mine synthetic fixture
+        run: |
+          PYTHONPATH=. python -m eval.run_eval \
+            --gt data/fixtures/synthetic_scene_001/gt.jsonl \
+            --tracks data/fixtures/synthetic_scene_001/tracks_expected.jsonl \
+            --scene-meta data/fixtures/synthetic_scene_001/scene_meta.json \
+            --scene-id synthetic_scene_001 \
+            --mine \
+            --out /tmp/fixture_metrics.json \
+            > /tmp/fixture_eval_stdout.txt
+          PYTHONPATH=. python <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          metrics = json.loads(Path("/tmp/fixture_metrics.json").read_text(encoding="utf-8"))
+          text = Path("/tmp/fixture_eval_stdout.txt").read_text(encoding="utf-8")
+          decoder = json.JSONDecoder()
+          idx = 0
+          objs = []
+          while idx < len(text):
+              while idx < len(text) and text[idx].isspace():
+                  idx += 1
+              if idx >= len(text):
+                  break
+              obj, end = decoder.raw_decode(text, idx)
+              objs.append(obj)
+              idx = end
+          mine = next((o for o in objs if isinstance(o, dict) and "n_failures" in o), {})
+          summary = (
+              "### Synthetic fixture eval (mine)\n\n"
+              "| metric | value |\n"
+              "|--------|-------|\n"
+              f"| MOTA | {metrics.get('mota')} |\n"
+              f"| IDS | {metrics.get('ids')} |\n"
+              f"| n_failures | {mine.get('n_failures', 0)} |\n"
+          )
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
+              fh.write(summary)
+          PY
+      - name: Post metric diff
+        if: always()
+        run: |
+          PYTHONPATH=. python -m eval.gate \
+            --baseline baselines/baseline.json \
+            --tracks /tmp/tracks_ci.jsonl \
+            --timing /tmp/timing_ci.json > /tmp/gate.json || true
+          echo '### trackbench regression gate' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/gate.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: trackbench
+          POSTGRES_PASSWORD: trackbench
+          POSTGRES_DB: trackbench
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trackbench -d trackbench"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://trackbench:trackbench@localhost:5432/trackbench?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & migrate
+        working-directory: api
+        run: |
+          npm ci
+          npx prisma migrate deploy
+          npx prisma generate
+          npm run build
+      - name: Health check
+        working-directory: api
+        run: |
+          node dist/index.js &
+          sleep 2
+          curl -sf http://localhost:3001/health | grep -q '"ok":true'

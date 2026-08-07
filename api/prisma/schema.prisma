@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Scene {
+  id            String         @id
+  name          String
+  numFrames     Int
+  weather       String?
+  timeOfDay     String?
+  failureEvents FailureEvent[]
+  sceneMetrics  SceneMetric[]
+}
+
+model Run {
+  id            String         @id @default(cuid())
+  commitSha     String
+  createdAt     DateTime       @default(now())
+  configJson    Json
+  runKey        String
+  notes         String?
+  metrics       RunMetric[]
+  sceneMetrics  SceneMetric[]
+  failureEvents FailureEvent[]
+  clusters      Cluster[]
+
+  @@index([commitSha])
+  @@unique([runKey])
+}
+
+model RunMetric {
+  id    String @id @default(cuid())
+  runId String
+  name  String
+  value Float
+  run   Run    @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, name])
+}
+
+model SceneMetric {
+  id      String @id @default(cuid())
+  runId   String
+  sceneId String
+  name    String
+  value   Float
+  run     Run    @relation(fields: [runId], references: [id], onDelete: Cascade)
+  scene   Scene  @relation(fields: [sceneId], references: [id])
+
+  @@unique([runId, sceneId, name])
+}
+
+model FailureEvent {
+  id           String  @id @default(cuid())
+  runId        String
+  sceneId      String
+  frame        Int
+  t            Float
+  kind         String
+  trackId      Int?
+  gtId         String?
+  severity     Float
+  featuresJson Json
+  clusterId    String?
+  run          Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  scene        Scene    @relation(fields: [sceneId], references: [id])
+  cluster      Cluster? @relation(fields: [clusterId], references: [id])
+  tags         Tag[]
+
+  @@index([runId, kind])
+  @@index([clusterId])
+}
+
+model Cluster {
+  id           String         @id @default(cuid())
+  runId        String
+  label        String?
+  size         Int
+  centroidJson Json
+  run          Run            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  events       FailureEvent[]
+
+  @@index([runId])
+}
+
+model Tag {
+  id      String       @id @default(cuid())
+  eventId String
+  name    String
+  author  String
+  event   FailureEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, name])
+}

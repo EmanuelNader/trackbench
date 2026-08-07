@@ -1,0 +1,9 @@
+{
+  "scene_name": "synthetic_scene_001",
+  "scene_token": "synthetic",
+  "source": "synthetic",
+  "n_frames": 20,
+  "weather": "clear",
+  "timeOfDay": "day",
+  "description": "synthetic two-car crossing scene for M0 demo / CI"
+}
