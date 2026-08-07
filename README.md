@@ -1,51 +1,86 @@
 # trackbench
 
-Run a deterministic CV-EKF tracker on logged driving data, mine failures, cluster them into bugs, and gate every change on regression.
+**A small system for debugging multi-object tracking on real driving logs.**
 
-**Loop:** ingest → C++ tracker → CLEAR MOT → failure mining → triage UI → CI gate.  
-**Result on nuScenes mini:** CLEAR-MOT IDS **890 → 415 (−53%)** across findings [001](docs/findings/001-dense-id-switch-velocity-gate.md)–[003](docs/findings/003-harder-birth-score.md) (honest null on [002](docs/findings/002-bev-iou-association.md)).
+Self-driving stacks need to know not only *what* is around the car, but *which* object is which over time. That second job is **tracking**: give each car/pedestrian a stable ID as frames roll by. When tracking fails, IDs swap, objects appear late, or ghost tracks show up — and a single score like “MOTA” rarely tells you *why*.
+
+trackbench is an end-to-end loop that:
+
+1. Takes **public** driving data + published detector boxes  
+2. Runs a **classical** (non-neural) tracker in C++  
+3. Scores it with standard MOT metrics  
+4. **Mines** concrete failures (especially identity switches)  
+5. Shows them in a **bird’s-eye triage UI** so you can see the bug  
+6. Lets you change the tracker, re-measure, and keep only real wins  
+7. Gates regressions in CI  
+
+**Headline result** on nuScenes mini: identity switches **890 → 415 (−53%)** via findings [001](docs/findings/001-dense-id-switch-velocity-gate.md)–[003](docs/findings/003-harder-birth-score.md) (with an honest null on [002](docs/findings/002-bev-iou-association.md)).
 
 <p align="center">
-  <img src="docs/assets/triage-bev.png" alt="trackbench BEV triage player: scene-0655 with selected ID_SWITCH and was→now explain panel" width="900" />
+  <img src="docs/assets/triage-bev.png" alt="trackbench bird's-eye triage UI on a dense scene with an ID switch selected" width="900" />
 </p>
 
-<p align="center"><em>Triage UI — <code>scene-0655</code>, selected <code>ID_SWITCH</code> with was→now explain panel.</em></p>
+<p align="center"><em>Bird’s-eye triage UI — blue = ground truth, orange = tracker IDs. Selected failure explains <code>was track 3 → now track 2</code>.</em></p>
 
-## What this is
+## What this is (for someone new)
 
-**Detection** answers “what objects are in this frame?”  
-**Tracking** answers “which of those is the *same* object over time?”
+| Term | Plain meaning |
+|------|----------------|
+| **Detection** | “In this frame, there is a car *here*.” |
+| **Tracking** | “That car is the *same* one as last frame — still ID 7.” |
+| **Ground truth (GT)** | The dataset’s answer key for where objects really were. |
+| **ID switch** | The answer-key object suddenly got a *different* tracker ID. |
+| **CLEAR MOT / MOTA / IDS** | Standard scoring: how often you’re wrong, including ID swaps. |
 
-trackbench focuses on tracking. It does **not** train a neural detector. Instead it consumes **[Megvii / CBGS](https://www.nuscenes.org/data/detection-megvii.zip)** — a public set of precomputed 3D boxes released as an official nuScenes tracking baseline — and associates them across frames with a classical CV-EKF tracker.
+This repo focuses on **tracking + evaluation + triage**. It does **not** train a neural detector.
+
+Instead it uses **[Megvii / CBGS](https://www.nuscenes.org/data/detection-megvii.zip)** detections — a public zip of precomputed boxes released as an official [nuScenes](https://www.nuscenes.org/) tracking baseline. Think: someone else’s “eyes,” your “memory” (the tracker).
 
 | Piece | Role |
 |-------|------|
 | **nuScenes `v1.0-mini`** | ~10 public driving scenes + ground-truth boxes |
-| **Megvii detections** | Precomputed boxes + scores (the tracker’s inputs) |
-| **Ingest** | Filters to tracking classes (score ≥ 0.3), merges Megvii train∪val for mini, writes ego-frame JSONL |
-| **Tracker / eval / UI** | Build IDs over time, score CLEAR MOT, mine failures, triage in BEV |
+| **Megvii detections** | Precomputed boxes + confidence scores (tracker inputs) |
+| **Ingest** | Filter to tracking classes (score ≥ 0.3), merge Megvii train∪val for mini, write simple ego-frame JSONL |
+| **C++ tracker** | Constant-velocity EKF + Hungarian matching — assigns IDs over time |
+| **Eval / mine / UI** | Score, list failures, cluster them, inspect in a top-down player |
 
-Why Megvii: public zip, stable schema, no detector training (project anti-goal). Details: [docs/data.md](docs/data.md), [docs/decisions.md](docs/decisions.md) (D1).
+Why Megvii: public, stable format, no detector training (project anti-goal). More detail: [docs/data.md](docs/data.md), [docs/decisions.md](docs/decisions.md).
 
-**Data not included.** This repo ships code + tiny synthetic fixtures only. nuScenes mini and Megvii detections are downloaded separately under their terms ([docs/data.md](docs/data.md)); `data/raw/` and real `data/normalized/` are gitignored.
+**Data not included.** This repo ships code + tiny synthetic fixtures only. Download nuScenes mini and Megvii yourself under their terms; `data/raw/` and real normalized scenes are gitignored.
+
+## How the loop works
+
+```text
+public data  →  ingest (JSONL)  →  C++ tracker  →  scores + failure list
+                                                      ↓
+                              CI gate ←  triage UI  ←  Postgres
+```
+
+Typical workflow after a tracker change:
+
+```bash
+make core
+./scripts/eval_all_scenes.sh --force   # must retrack; don’t reuse old tracks.jsonl
+# compare IDS / open UI on the new run
+```
 
 ## Metrics (nuScenes `v1.0-mini`)
 
-Megvii train∪val detections, 7 tracking classes, det score ≥ 0.3.
+Same public setup for every finding: Megvii train∪val, 7 tracking classes, det score ≥ 0.3.
 
-| metric | pre-001 | post-001 | post-003 (`min_birth_score=0.7`) |
-|--------|---------|----------|----------------------------------|
-| Total CLEAR-MOT IDS | 890 | ~618 | **415** (−53% vs pre-001) |
-| scene-0655 IDS | 471 | ~326 | **216** |
-| scene-0916 IDS | 384 | ~287 | **197** |
+| metric | before findings | after 001 | after 003 (birth score 0.7) |
+|--------|-----------------|-----------|------------------------------|
+| Total identity switches (IDS) | 890 | ~618 | **415** (−53% vs start) |
+| densest scene `0655` IDS | 471 | ~326 | **216** |
+| densest scene `0916` IDS | 384 | ~287 | **197** |
 
-| Finding | Change | Outcome |
-|---------|--------|---------|
-| [001](docs/findings/001-dense-id-switch-velocity-gate.md) | Soft lateral velocity cost + `gate_m=1.5` + birth 0.5 | **IDS 890 → ~618** |
-| [002](docs/findings/002-bev-iou-association.md) | Soft BEV IoU association term | **Null** (618 → 619) |
-| [003](docs/findings/003-harder-birth-score.md) | `min_birth_score` 0.5 → 0.7 | **IDS 619 → 415** |
+| Finding | What we changed | Outcome |
+|---------|-----------------|---------|
+| [001](docs/findings/001-dense-id-switch-velocity-gate.md) | Prefer motion-consistent matches; tighter gate; don’t birth tracks from weak dets | **Win** — IDS 890 → ~618 |
+| [002](docs/findings/002-bev-iou-association.md) | Also use box-overlap (IoU) in matching cost | **Null** — IDS unchanged (~619) |
+| [003](docs/findings/003-harder-birth-score.md) | Require higher confidence before starting a new ID (`0.5 → 0.7`) | **Win** — IDS 619 → 415 |
 
-MOTA stays mid/weak on dense scenes — expected for a simple classical CV tracker. The deliverable is the **mined ID-switch cut**, not a leaderboard score.
+Overall accuracy (MOTA) is still mid/weak on crowded scenes — expected for a simple classical tracker. The point of this project is the **mined ID-switch cut** and the triage loop, not topping a leaderboard.
 
 ## Architecture
 
@@ -89,7 +124,7 @@ cd ../web && npm ci && npm run dev
 
 If Homebrew Postgres already owns port 5432, stop it before `make up` (or remap Docker to 5433). See [docs/mini-ui.md](docs/mini-ui.md).
 
-### Real mini
+### Real mini (the numbers above)
 
 ```bash
 python scripts/merge_megvii_mini.py
@@ -127,24 +162,24 @@ Re-run on your machine for Apple Silicon / laptop numbers; CI can gate on p99 wh
 
 ## What I'd do next
 
-1. **Per-class coast / birth** — pedestrians vs cars (LATE_INIT / FN residual).
-2. **Optional:** keep tentatives out of Hungarian until `promote_hits`.
+1. **Per-class coast / birth** — pedestrians vs cars (late starts / misses that remain).
+2. **Optional:** don’t let brand-new tracks compete in matching until they’re confirmed.
 3. **Optional:** host-specific latency on Apple Silicon via `make bench-latency`.
 
 ## Layout
 
 ```
-core/       C++17 CV-EKF tracker (Hungarian + lifecycle), GoogleTest + golden
+core/       C++17 tracker (EKF + Hungarian + lifecycle), GoogleTest + golden
 ingest/     nuScenes → ego-frame JSONL (--synthetic for offline demo)
-eval/       CLEAR MOT, failure mining, rule clustering, CI gate
+eval/       MOT scores, failure mining, clustering, CI gate
 api/        Express + Prisma
-web/        React triage UI + Canvas 2D BEV player
+web/        React triage UI + Canvas 2D bird’s-eye player
 scripts/    eval_all_scenes.sh (--force), merge_megvii_mini.py, bench_latency.py
-data/fixtures/   committed synthetic scene + demo_bundle.json
+data/fixtures/   tiny synthetic scene for CI / demo (not the full dataset)
 baselines/baseline.json   CI metric floor
-docs/findings/            001–003 writeups
+docs/findings/            experiment writeups 001–003
 docs/bench/               latency reference JSON
-docs/assets/              triage UI diagram / screenshots
+docs/assets/              README screenshot
 ```
 
 ## Milestones
@@ -155,10 +190,14 @@ docs/assets/              triage UI diagram / screenshots
 | M1 Tracker v0 | done (golden byte-identical) |
 | M2 Metrics | done |
 | M3 Failure mining | done (rule clusters) |
-| M4 Triage UI | done (demo + mini via NORMALIZED_ROOT) |
+| M4 Triage UI | done (demo + real mini scenes) |
 | M5 CI gate | done (synthetic fixture floor) |
 | M6 Findings | done — [001](docs/findings/001-dense-id-switch-velocity-gate.md) win, [002](docs/findings/002-bev-iou-association.md) null, [003](docs/findings/003-harder-birth-score.md) win |
 
 ## Constraints
 
 Public data and knowledge only. Deterministic outputs. Eval before features. Small first (`v1.0-mini`).
+
+## License
+
+Code and docs in this repository are [MIT](LICENSE). nuScenes and Megvii data remain under their upstream licenses/terms — obtain them from the official sources; they are not redistributed here.
