@@ -1,10 +1,29 @@
 #!/usr/bin/env bash
 # Run tracker (if needed) + CLEAR MOT / failure mining on every normalized scene.
 # Works on macOS bash 3.2+ (and zsh when invoked as bash via env).
+#
+# Usage:
+#   ./scripts/eval_all_scenes.sh           # skip tracker if tracks.jsonl exists
+#   ./scripts/eval_all_scenes.sh --force   # re-run tracker (needed after config change)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+
+FORCE=0
+for arg in "$@"; do
+  case "$arg" in
+    --force|-f) FORCE=1 ;;
+    -h|--help)
+      echo "Usage: $0 [--force]"
+      exit 0
+      ;;
+    *)
+      echo "unknown arg: $arg (try --force)" >&2
+      exit 1
+      ;;
+  esac
+done
 
 NORMALIZED_ROOT="${NORMALIZED_ROOT:-data/normalized}"
 TRACKS_OUT_ROOT="${TRACKS_OUT_ROOT:-data/tracks}"
@@ -48,15 +67,17 @@ for scene_dir in "${scene_dirs[@]}"; do
     continue
   fi
 
-  if [[ ! -f "$tracks" ]]; then
+  if [[ "$FORCE" -eq 1 || ! -f "$tracks" ]]; then
     echo "==> tracking $scene"
     "$TRACKER_BIN" \
       --dets "$dets" \
       --config "$CONFIG" \
       --out "$tracks" \
       --timing "$scene_dir/timing.json"
+    # Keep TRACKS_ROOT copy in sync for the triage API (if used).
+    cp -f "$tracks" "$TRACKS_OUT_ROOT/${scene}.jsonl"
   else
-    echo "==> tracks exist for $scene (skip tracker)"
+    echo "==> tracks exist for $scene (skip tracker; pass --force to retrack)"
   fi
 
   echo "==> eval --mine $scene -> $eval_out"
