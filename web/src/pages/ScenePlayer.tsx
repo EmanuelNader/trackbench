@@ -11,6 +11,80 @@ import { BevCanvas } from "../components/BevCanvas";
 
 const PLAY_MS = 280;
 
+function EventExplain({ event }: { event: FailureEvent }) {
+  const prev = event.features?.prev_track_id;
+  const next =
+    event.features?.new_track_id ?? event.trackId ?? null;
+  const gtShort =
+    event.gtId != null
+      ? `${String(event.gtId).slice(0, 8)}…`
+      : "—";
+
+  if (event.kind === "ID_SWITCH") {
+    return (
+      <div className="event-explain">
+        <p>
+          This blue car (<span className="mono">{gtShort}</span>) changed
+          which orange track ID it was matched to.
+        </p>
+        {prev != null && next != null ? (
+          <p className="switch-line mono">
+            was <strong>tr {String(prev)}</strong>
+            {" → "}
+            now <strong>tr {String(next)}</strong>
+          </p>
+        ) : (
+          <p className="switch-line mono">
+            now <strong>tr {String(event.trackId ?? "?")}</strong>
+            <span className="muted">
+              {" "}
+              (re-mine run to see previous id)
+            </span>
+          </p>
+        )}
+        <p className="muted tip">
+          Ignore the crowded pile — this line is the failure. Step −1/+1 only
+          to see if the new id sticks to the car.
+        </p>
+      </div>
+    );
+  }
+
+  if (event.kind === "LATE_INIT") {
+    return (
+      <div className="event-explain">
+        <p>
+          Blue GT <span className="mono">{gtShort}</span> was visible for
+          several frames before any track matched it (
+          <span className="mono">tr —</span>).
+        </p>
+        <p className="muted tip">Tracker started late or never on this object.</p>
+      </div>
+    );
+  }
+
+  if (event.kind === "GHOST_TRACK") {
+    return (
+      <div className="event-explain">
+        <p>
+          Orange <span className="mono">tr {String(event.trackId ?? "?")}</span>{" "}
+          has no nearby blue GT — a false track.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="event-explain">
+      <p className="muted" style={{ margin: 0 }}>
+        {event.kind} @ frame {event.frame}
+        {event.trackId != null ? ` · tr ${event.trackId}` : ""}
+        {event.gtId != null ? ` · gt ${gtShort}` : ""}
+      </p>
+    </div>
+  );
+}
+
 export function ScenePlayer() {
   const { runId, sceneId } = useParams<{ runId: string; sceneId: string }>();
   const [params, setParams] = useSearchParams();
@@ -170,6 +244,17 @@ export function ScenePlayer() {
                 </li>
               ))}
             </ul>
+          )}
+        </div>
+
+        <div>
+          <h2>What this means</h2>
+          {!selected ? (
+            <p className="muted" style={{ fontSize: "0.8rem" }}>
+              Select a failure event.
+            </p>
+          ) : (
+            <EventExplain event={selected} />
           )}
         </div>
 

@@ -229,6 +229,19 @@ def mine_failures(
             gbox = gt_map[gid]
 
             if gid in prev_match and prev_match[gid] != tid:
+                prev_tid = int(prev_match[gid])
+                feats = _make_features(
+                    x=float(gbox["x"]),
+                    y=float(gbox["y"]),
+                    cls=str(gbox.get("cls", "unknown")),
+                    visibility=_vis(gbox),
+                    neighbor_sources=gt_boxes,
+                    self_id=gid,
+                    duration_frames=1,
+                    scene_meta=meta,
+                )
+                feats["prev_track_id"] = prev_tid
+                feats["new_track_id"] = int(tid)
                 events.append(
                     _event(
                         scene_id=scene_id,
@@ -238,16 +251,7 @@ def mine_failures(
                         track_id=tid,
                         gt_id=gid,
                         severity=1.0,
-                        features=_make_features(
-                            x=float(gbox["x"]),
-                            y=float(gbox["y"]),
-                            cls=str(gbox.get("cls", "unknown")),
-                            visibility=_vis(gbox),
-                            neighbor_sources=gt_boxes,
-                            self_id=gid,
-                            duration_frames=1,
-                            scene_meta=meta,
-                        ),
+                        features=feats,
                     )
                 )
 

@@ -402,6 +402,40 @@ table.data tbody tr:hover {
   background: rgba(255, 230, 120, 0.25);
 }
 
+.event-explain {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: rgba(12, 16, 22, 0.55);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.75rem;
+}
+
+.event-explain p {
+  margin: 0 0 0.45rem;
+}
+
+.event-explain p:last-child {
+  margin-bottom: 0;
+}
+
+.event-explain .switch-line {
+  font-size: 0.9rem;
+  color: #ffe678;
+  margin: 0.55rem 0;
+}
+
+.event-explain .switch-line strong {
+  color: #fff6c2;
+  font-weight: 600;
+}
+
+.event-explain .tip {
+  font-size: 0.72rem;
+  margin-top: 0.35rem;
+}
+
 .side-panel {
   background: var(--bg-elev);
   border-left: 1px solid var(--border);
