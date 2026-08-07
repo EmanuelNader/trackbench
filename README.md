@@ -88,9 +88,9 @@ Details: [docs/data.md](docs/data.md), [docs/mini-ui.md](docs/mini-ui.md).
 
 ## What I'd do next
 
-1. **Remeasure finding [002](docs/findings/002-bev-iou-association.md)** — BEV IoU association cost shipped; fill before/after IDS on mini (`scene-0655` / `scene-0916`).
-2. **LATE_INIT / FN still high** after the birth-score tradeoff — delayed starts and missed associations remain the dominant residual errors on dense scenes.
-3. **Global params only** — one `gate_m` / process-noise set for all classes; per-class coast, birth, and `iou_weight` next.
+1. **Finding [002](docs/findings/002-bev-iou-association.md) was a null** — soft BEV IoU (`iou_weight=2`) left total IDS 618→619; keep the helper, don’t claim an IDS win.
+2. **Attack birth/death churn next** — harder / per-class `min_birth_score`, or require N gated hits before confirm; residual switches on 0655/0916 look more like churn than parallel-box ambiguity.
+3. **Per-class coast / process noise** — pedestrians vs cars; LATE_INIT / FN still dominate after the birth-score tradeoff.
 
 ## Layout
 

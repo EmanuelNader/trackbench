@@ -94,6 +94,6 @@ Full after table:
 
 ## What I'd do next
 
-1. Class-specific coast / process noise (pedestrians vs cars).
-2. BEV IoU term in association cost for near-parallel traffic.
-3. Tune `min_birth_score` per class; revisit `gate_m` on high-speed scenes.
+1. ~~BEV IoU term~~ — tried in [002](002-bev-iou-association.md); **null** on IDS.
+2. Harder / per-class birth (score + N-hit confirm) to cut ID churn on 0655/0916.
+3. Class-specific coast / process noise (pedestrians vs cars); revisit `gate_m` on high-speed scenes.
