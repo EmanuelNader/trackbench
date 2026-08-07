@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="trackbench BEV triage player">
+  <defs>
+    <radialGradient id="bev" cx="42%" cy="48%" r="55%">
+      <stop offset="0%" stop-color="#182230"/>
+      <stop offset="100%" stop-color="#0c1016"/>
+    </radialGradient>
+    <style>
+      .label { font: 600 14px 'IBM Plex Sans', system-ui, sans-serif; fill: #e6edf3; }
+      .muted { font: 12px 'IBM Plex Sans', system-ui, sans-serif; fill: #8b9bb0; }
+      .mono { font: 11px 'IBM Plex Mono', ui-monospace, monospace; fill: #c5d0dc; }
+      .kind { font: 700 10px 'IBM Plex Mono', ui-monospace, monospace; fill: #fff; }
+      .title { font: 700 18px 'IBM Plex Sans', system-ui, sans-serif; fill: #e6edf3; }
+      .switch { font: 600 13px 'IBM Plex Mono', ui-monospace, monospace; fill: #ffe678; }
+    </style>
+  </defs>
+
+  <!-- chrome -->
+  <rect width="1280" height="720" fill="#0f1419"/>
+  <rect width="1280" height="48" fill="#171d25"/>
+  <text x="20" y="30" class="title">trackbench</text>
+  <text x="140" y="30" class="muted">runs / player / scene-0655</text>
+
+  <!-- BEV stage -->
+  <rect x="0" y="48" width="920" height="560" fill="url(#bev)"/>
+  <!-- grid -->
+  <g stroke="#2a3441" stroke-width="1" opacity="0.7">
+    <line x1="460" y1="48" x2="460" y2="608"/>
+    <line x1="0" y1="328" x2="920" y2="328"/>
+    <circle cx="460" cy="328" r="80" fill="none"/>
+    <circle cx="460" cy="328" r="160" fill="none"/>
+  </g>
+  <circle cx="460" cy="328" r="4" fill="#c5d0dc"/>
+  <text x="470" y="324" class="mono">ego</text>
+
+  <!-- GT boxes (blue) -->
+  <g fill="rgba(94,177,255,0.12)" stroke="#5eb1ff" stroke-width="1.5">
+    <rect x="520" y="250" width="36" height="18" transform="rotate(-8 538 259)"/>
+    <rect x="580" y="280" width="40" height="18" transform="rotate(12 600 289)"/>
+    <rect x="400" y="400" width="38" height="17" transform="rotate(-20 419 408)"/>
+    <rect x="300" y="220" width="34" height="16" transform="rotate(5 317 228)"/>
+    <rect x="640" y="360" width="42" height="18" transform="rotate(-15 661 369)"/>
+    <rect x="240" y="360" width="30" height="14" transform="rotate(25 255 367)"/>
+  </g>
+  <!-- tracks (orange) -->
+  <g fill="rgba(240,163,94,0.12)" stroke="#f0a35e" stroke-width="1.5">
+    <rect x="524" y="252" width="34" height="16" transform="rotate(-6 541 260)"/>
+    <rect x="404" y="402" width="36" height="15" transform="rotate(-18 422 409)"/>
+    <rect x="644" y="362" width="38" height="16" transform="rotate(-12 663 370)"/>
+  </g>
+
+  <!-- selected highlight -->
+  <circle cx="422" cy="410" r="48" fill="none" stroke="#ffe678" stroke-width="2" stroke-dasharray="6 5"/>
+  <rect x="404" y="402" width="36" height="15" fill="rgba(255,230,120,0.2)" stroke="#ffb86b" stroke-width="2.5" transform="rotate(-18 422 409)"/>
+  <text x="390" y="390" class="switch">tr 2</text>
+  <text x="448" y="448" class="mono" fill="#7ec8ff">GT f6f3271&</text>
+
+  <rect x="16" y="64" width="210" height="28" rx="4" fill="rgba(12,16,22,0.82)" stroke="#2a3441"/>
+  <text x="28" y="82" class="mono" fill="#8b9bb0">GT · track · ego · selected</text>
+  <rect x="16" y="560" width="260" height="28" rx="4" fill="rgba(12,16,22,0.82)"/>
+  <text x="28" y="578" class="switch">selected · tr 2 · gt f6f3271&</text>
+
+  <!-- side panel -->
+  <rect x="920" y="48" width="360" height="560" fill="#171d25"/>
+  <text x="940" y="80" class="label">SCENE</text>
+  <text x="940" y="102" class="mono">scene-0655 · t=1.50s</text>
+
+  <text x="940" y="140" class="label">FAILURE EVENTS</text>
+  <rect x="940" y="154" width="320" height="44" rx="4" fill="#1c2430" stroke="#2a3441"/>
+  <rect x="952" y="166" width="72" height="18" rx="3" fill="#c45c5c"/>
+  <text x="960" y="179" class="kind">LATE_INIT</text>
+  <text x="1034" y="179" class="mono">f2</text>
+
+  <rect x="940" y="208" width="320" height="56" rx="4" fill="#1c2430" stroke="#3d9a6a" stroke-width="2"/>
+  <rect x="952" y="220" width="78" height="18" rx="3" fill="#c45c5c"/>
+  <text x="958" y="233" class="kind">ID_SWITCH</text>
+  <text x="1040" y="233" class="mono">f3</text>
+  <text x="952" y="252" class="mono">tr 2 · gt f6f32719&</text>
+
+  <text x="940" y="300" class="label">WHAT THIS MEANS</text>
+  <rect x="940" y="314" width="320" height="110" rx="4" fill="rgba(12,16,22,0.55)" stroke="#2a3441"/>
+  <text x="956" y="340" class="muted">This blue car changed which orange</text>
+  <text x="956" y="358" class="muted">track ID it was matched to.</text>
+  <text x="956" y="386" class="switch">was tr 3 ’ now tr 2</text>
+  <text x="956" y="410" class="muted">Ignore the crowded pile  this line</text>
+  <text x="956" y="426" class="muted">is the failure.</text>
+
+  <!-- timeline -->
+  <rect x="0" y="608" width="1280" height="112" fill="#171d25"/>
+  <text x="24" y="640" class="mono">Play   1   +1     frame 3 / 40 · 41 gt · 18 trk</text>
+  <rect x="24" y="660" width="1232" height="8" rx="4" fill="#2a3441"/>
+  <rect x="24" y="660" width="92" height="8" rx="4" fill="#3d9a6a"/>
+  <!-- ticks -->
+  <g stroke="#e06c75" stroke-width="2">
+    <line x1="70" y1="652" x2="70" y2="676"/>
+    <line x1="110" y1="652" x2="110" y2="676"/>
+    <line x1="180" y1="652" x2="180" y2="676"/>
+    <line x1="260" y1="652" x2="260" y2="676"/>
+    <line x1="340" y1="652" x2="340" y2="676"/>
+    <line x1="420" y1="652" x2="420" y2="676"/>
+    <line x1="520" y1="652" x2="520" y2="676"/>
+    <line x1="640" y1="652" x2="640" y2="676"/>
+    <line x1="780" y1="652" x2="780" y2="676"/>
+  </g>
+  <text x="24" y="700" class="muted">BEV triage  selected ID_SWITCH with was’now explain panel</text>
+</svg>
