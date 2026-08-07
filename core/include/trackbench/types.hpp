@@ -100,7 +100,7 @@ struct TrackerConfig {
   /// Soft BEV IoU term: add iou_weight * (1 - bev_iou) inside the gate.
   double iou_weight = 2.0;
   /// Only birth new tracks from detections at/above this score.
-  double min_birth_score = 0.5;
+  double min_birth_score = 0.7;
 };
 
 inline const char* track_state_string(TrackState s) {

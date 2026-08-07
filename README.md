@@ -2,21 +2,21 @@
 
 Run a deterministic CV-EKF tracker on logged driving data, mine failures, cluster them into bugs, and gate every change on regression.
 
-> **Status (M0–M6 complete):** End-to-end loop — ingest → C++ tracker → CLEAR MOT → failure mining → rule clusters → triage UI → CI gate. Real nuScenes mini + Megvii detections supported. Finding [001](docs/findings/001-dense-id-switch-velocity-gate.md) landed (dense ID-switch / velocity-gate fix).
+> **Status (M0–M6 complete):** End-to-end loop — ingest → C++ tracker → CLEAR MOT → failure mining → rule clusters → triage UI → CI gate. Real nuScenes mini + Megvii detections supported. Findings [001](docs/findings/001-dense-id-switch-velocity-gate.md) + [003](docs/findings/003-harder-birth-score.md) cut mini IDS **890 → 415**.
 
 Scene player screenshots: see PR / [docs/architecture.md](docs/architecture.md). No demo GIF checked in yet.
 
-## Metrics (M6 — baseline vs after)
+## Metrics (mini — stacked findings)
 
-nuScenes `v1.0-mini` (10 scenes), Megvii train∪val, tracking classes, det score ≥ 0.3. Soft lateral velocity cost + tighter gate + `min_birth_score=0.5`. Full writeup: [docs/findings/001-dense-id-switch-velocity-gate.md](docs/findings/001-dense-id-switch-velocity-gate.md).
+nuScenes `v1.0-mini` (10 scenes), Megvii train∪val, tracking classes, det score ≥ 0.3.
 
-| metric | baseline | after M6 fix |
-|--------|----------|--------------|
-| Aggregate `ID_SWITCH` | 890 | **618** (−30%) |
-| scene-0655 IDS | 471 | **326** |
-| scene-0916 IDS | 384 | **287** |
+| metric | pre-001 | post-001 | post-003 (`min_birth_score=0.7`) |
+|--------|---------|----------|----------------------------------|
+| Total CLEAR-MOT IDS | 890 | ~618 | **415** (−53% vs pre-001) |
+| scene-0655 IDS | 471 | ~326 | **216** |
+| scene-0916 IDS | 384 | ~287 | **197** |
 
-MOTA is still mid/weak (negative on several dense scenes). Expected for a simple classical CV tracker; the miner deliverable here is the ID-switch cut, not a leaderboard score.
+Writeups: [001](docs/findings/001-dense-id-switch-velocity-gate.md) (velocity + birth 0.5), [002](docs/findings/002-bev-iou-association.md) (IoU null), [003](docs/findings/003-harder-birth-score.md) (birth 0.7). MOTA still weak on dense scenes; deliverable is the mined ID-switch cut.
 
 ## Architecture
 
@@ -88,9 +88,9 @@ Details: [docs/data.md](docs/data.md), [docs/mini-ui.md](docs/mini-ui.md).
 
 ## What I'd do next
 
-1. **Finding [002](docs/findings/002-bev-iou-association.md) was a null** — soft BEV IoU (`iou_weight=2`) left total IDS 618→619; keep the helper, don’t claim an IDS win.
-2. **Attack birth/death churn next** — harder / per-class `min_birth_score`, or require N gated hits before confirm; residual switches on 0655/0916 look more like churn than parallel-box ambiguity.
-3. **Per-class coast / process noise** — pedestrians vs cars; LATE_INIT / FN still dominate after the birth-score tradeoff.
+1. **Finding [003](docs/findings/003-harder-birth-score.md) shipped** — `min_birth_score` 0.5→0.7 cut IDS 619→415; re-load UI via `write_run --mine --write-db`.
+2. **Per-class coast / birth** — pedestrians vs cars; LATE_INIT / FN residual.
+3. **Optional:** tentatives out of Hungarian until `promote_hits` (if dense IDS remain after triage).
 
 ## Layout
 
