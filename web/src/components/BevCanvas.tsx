@@ -4,7 +4,26 @@ import type { BevBox, FramePayload } from "../api";
 type Props = {
   frame: FramePayload | null;
   metersSpan?: number;
+  /** GT instance token to emphasize (from selected failure event). */
+  highlightGtId?: string | number | null;
+  /** Tracker id to emphasize (from selected failure event). */
+  highlightTrackId?: string | number | null;
 };
+
+function idsEqual(
+  a: unknown,
+  b: string | number | null | undefined,
+): boolean {
+  if (b == null || b === "") return false;
+  if (a == null) return false;
+  return String(a) === String(b);
+}
+
+function shortId(id: unknown, max = 7): string {
+  if (id == null) return "?";
+  const s = String(id);
+  return s.length <= max ? s : `${s.slice(0, max)}…`;
+}
 
 function drawBox(
   ctx: CanvasRenderingContext2D,
@@ -14,15 +33,33 @@ function drawBox(
   cx: number,
   cy: number,
   label: string,
+  opts?: { highlight?: boolean; lineWidth?: number },
 ) {
   const l = box.l ?? 4.5;
   const w = box.w ?? 1.8;
   const yaw = box.yaw ?? 0;
   const x = box.x;
   const y = box.y;
+  const highlight = opts?.highlight ?? false;
+  const lineWidth = opts?.lineWidth ?? (highlight ? 3 : 1.5);
+
+  const sx = cx + x * scale;
+  const sy = cy - y * scale;
+
+  if (highlight) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(255, 230, 120, 0.9)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.arc(sx, sy, Math.max(l, w) * scale * 0.75 + 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
 
   ctx.save();
-  ctx.translate(cx + x * scale, cy - y * scale);
+  ctx.translate(sx, sy);
   ctx.rotate(-yaw);
 
   const pw = l * scale;
@@ -30,7 +67,11 @@ function drawBox(
   ctx.strokeStyle = color;
   ctx.fillStyle =
     color.startsWith("#") && color.length === 7 ? `${color}26` : "rgba(255,255,255,0.08)";
-  ctx.lineWidth = 1.5;
+  if (highlight) {
+    ctx.fillStyle =
+      color.startsWith("#") && color.length === 7 ? `${color}55` : "rgba(255,230,120,0.25)";
+  }
+  ctx.lineWidth = lineWidth;
   ctx.beginPath();
   ctx.rect(-pw / 2, -ph / 2, pw, ph);
   ctx.fill();
@@ -45,13 +86,20 @@ function drawBox(
   ctx.restore();
 
   // Label in screen space
-  ctx.fillStyle = color;
-  ctx.font = "11px IBM Plex Mono, monospace";
+  ctx.fillStyle = highlight ? "#ffe678" : color;
+  ctx.font = highlight
+    ? "bold 12px IBM Plex Mono, monospace"
+    : "11px IBM Plex Mono, monospace";
   ctx.textAlign = "center";
-  ctx.fillText(label, cx + x * scale, cy - y * scale - (w * scale) / 2 - 6);
+  ctx.fillText(label, sx, sy - (w * scale) / 2 - (highlight ? 10 : 6));
 }
 
-export function BevCanvas({ frame, metersSpan = 50 }: Props) {
+export function BevCanvas({
+  frame,
+  metersSpan = 50,
+  highlightGtId = null,
+  highlightTrackId = null,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -150,13 +198,23 @@ export function BevCanvas({ frame, metersSpan = 50 }: Props) {
         return;
       }
 
+      const hiGt: BevBox[] = [];
+      const hiTrk: BevBox[] = [];
+
       for (const g of frame.gt) {
-        const id = g.id != null ? String(g.id) : "?";
-        drawBox(ctx, g, "#5eb1ff", scale, cx, cy, id);
+        if (idsEqual(g.id, highlightGtId)) {
+          hiGt.push(g);
+          continue;
+        }
+        drawBox(ctx, g, "#5eb1ff", scale, cx, cy, shortId(g.id));
       }
       for (const t of frame.tracks) {
+        const isHi = idsEqual(t.id, highlightTrackId);
+        if (isHi) {
+          hiTrk.push(t);
+          continue;
+        }
         if (t.state && t.state !== "confirmed" && t.state !== "coasting") {
-          // Still draw tentatives faintly
           drawBox(
             ctx,
             t,
@@ -164,11 +222,46 @@ export function BevCanvas({ frame, metersSpan = 50 }: Props) {
             scale,
             cx,
             cy,
-            `${t.id ?? "?"}·${t.state?.[0] ?? "?"}`,
+            `${shortId(t.id, 4)}·${t.state?.[0] ?? "?"}`,
           );
           continue;
         }
         drawBox(ctx, t, "#f0a35e", scale, cx, cy, String(t.id ?? "?"));
+      }
+
+      // Selected boxes last so they sit on top
+      for (const g of hiGt) {
+        drawBox(ctx, g, "#7ec8ff", scale, cx, cy, `GT ${shortId(g.id)}`, {
+          highlight: true,
+        });
+      }
+      for (const t of hiTrk) {
+        const label =
+          t.state && t.state !== "confirmed" && t.state !== "coasting"
+            ? `tr ${t.id}·${t.state?.[0] ?? "?"}`
+            : `tr ${t.id ?? "?"}`;
+        drawBox(ctx, t, "#ffb86b", scale, cx, cy, label, { highlight: true });
+      }
+
+      if (highlightGtId || highlightTrackId) {
+        const bits: string[] = ["selected"];
+        if (highlightTrackId) bits.push(`tr ${highlightTrackId}`);
+        if (highlightGtId) bits.push(`gt ${shortId(highlightGtId)}`);
+        const missing: string[] = [];
+        if (highlightGtId && hiGt.length === 0) missing.push("GT not in frame");
+        if (highlightTrackId && hiTrk.length === 0) missing.push("track not in frame");
+        const boxH = missing.length ? 44 : 28;
+        const boxY = h - boxH - 12;
+        ctx.fillStyle = "rgba(12, 16, 22, 0.82)";
+        ctx.fillRect(10, boxY, 300, boxH);
+        ctx.fillStyle = "#ffe678";
+        ctx.font = "12px IBM Plex Mono, monospace";
+        ctx.textAlign = "left";
+        ctx.fillText(bits.join(" · "), 18, boxY + 18);
+        if (missing.length) {
+          ctx.fillStyle = "#e06c75";
+          ctx.fillText(missing.join(" · "), 18, boxY + 36);
+        }
       }
     };
 
@@ -176,7 +269,7 @@ export function BevCanvas({ frame, metersSpan = 50 }: Props) {
     const ro = new ResizeObserver(() => paint());
     ro.observe(wrap);
     return () => ro.disconnect();
-  }, [frame, metersSpan]);
+  }, [frame, metersSpan, highlightGtId, highlightTrackId]);
 
   return (
     <div className="bev-stage" ref={wrapRef}>
@@ -193,6 +286,10 @@ export function BevCanvas({ frame, metersSpan = 50 }: Props) {
         <span className="ego">
           <i />
           ego
+        </span>
+        <span className="hi">
+          <i />
+          selected
         </span>
       </div>
     </div>

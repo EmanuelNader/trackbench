@@ -397,6 +397,11 @@ table.data tbody tr:hover {
   border-radius: 50%;
 }
 
+.bev-legend .hi i {
+  border-color: #ffe678;
+  background: rgba(255, 230, 120, 0.25);
+}
+
 .side-panel {
   background: var(--bg-elev);
   border-left: 1px solid var(--border);

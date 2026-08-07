@@ -125,7 +125,11 @@ export function ScenePlayer() {
 
   return (
     <div className="player-layout fade-in">
-      <BevCanvas frame={frame} />
+      <BevCanvas
+        frame={frame}
+        highlightGtId={selected?.gtId ?? null}
+        highlightTrackId={selected?.trackId ?? null}
+      />
 
       <aside className="side-panel">
         <div>
