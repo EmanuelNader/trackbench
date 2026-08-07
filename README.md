@@ -6,10 +6,10 @@ Run a deterministic CV-EKF tracker on logged driving data, mine failures, cluste
 **Result on nuScenes mini:** CLEAR-MOT IDS **890 → 415 (−53%)** across findings [001](docs/findings/001-dense-id-switch-velocity-gate.md)–[003](docs/findings/003-harder-birth-score.md) (honest null on [002](docs/findings/002-bev-iou-association.md)).
 
 <p align="center">
-  <img src="docs/assets/triage-bev.svg" alt="trackbench BEV triage player with selected ID_SWITCH and was→now explain panel" width="900" />
+  <img src="docs/assets/triage-bev.png" alt="trackbench BEV triage player: scene-0655 with selected ID_SWITCH and was→now explain panel" width="900" />
 </p>
 
-<p align="center"><em>Triage UI — selected <code>ID_SWITCH</code> with was→now explain panel. Drop a real window shot at <code>docs/assets/triage-bev.png</code> to replace this diagram (see <a href="docs/assets/README.md">docs/assets</a>).</em></p>
+<p align="center"><em>Triage UI — <code>scene-0655</code>, selected <code>ID_SWITCH</code> with was→now explain panel.</em></p>
 
 ## Metrics (nuScenes `v1.0-mini`)
 
@@ -111,7 +111,7 @@ Re-run on your machine for Apple Silicon / laptop numbers; CI can gate on p99 wh
 
 1. **Per-class coast / birth** — pedestrians vs cars (LATE_INIT / FN residual).
 2. **Optional:** keep tentatives out of Hungarian until `promote_hits`.
-3. **Portfolio:** replace the SVG with a real `docs/assets/triage-bev.png` window shot.
+3. **Optional:** host-specific latency on Apple Silicon via `make bench-latency`.
 
 ## Layout
 
