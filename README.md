@@ -27,6 +27,8 @@ trackbench focuses on tracking. It does **not** train a neural detector. Instead
 
 Why Megvii: public zip, stable schema, no detector training (project anti-goal). Details: [docs/data.md](docs/data.md), [docs/decisions.md](docs/decisions.md) (D1).
 
+**Data not included.** This repo ships code + tiny synthetic fixtures only. nuScenes mini and Megvii detections are downloaded separately under their terms ([docs/data.md](docs/data.md)); `data/raw/` and real `data/normalized/` are gitignored.
+
 ## Metrics (nuScenes `v1.0-mini`)
 
 Megvii train∪val detections, 7 tracking classes, det score ≥ 0.3.
