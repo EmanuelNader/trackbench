@@ -24,6 +24,10 @@ up:
 down:
 	docker compose down
 
+# Default matches docker-compose.yml; override with export DATABASE_URL=...
+DATABASE_URL ?= postgresql://trackbench:trackbench@localhost:5432/trackbench?schema=public
+export DATABASE_URL
+
 migrate: api-install
 	cd api && npx prisma migrate deploy
 
