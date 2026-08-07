@@ -99,6 +99,8 @@ def test_id_switch_emitted():
     assert e0["features"]["time_of_day"] == "day"
     assert e0["features"]["range_bin"] in {"near", "mid", "far"}
     assert e0["features"]["ego_speed"] == 0.0
+    assert e0["features"]["prev_track_id"] != e0["features"]["new_track_id"]
+    assert e0["features"]["new_track_id"] == e0["track_id"]
 
 
 def test_late_init_after_three_unmatched_frames():
