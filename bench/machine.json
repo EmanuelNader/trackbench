@@ -1,0 +1,17 @@
+{
+  "cpu_model": "Apple M5 Pro",
+  "cpu_cores_physical": 18,
+  "cpu_cores_logical": 18,
+  "ram_gb": 25.769803776,
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+  "cmake_flags": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CXX_FLAGS": "",
+    "CMAKE_CXX_FLAGS_DEBUG": "-g",
+    "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+    "TRACKBENCH_BUILD_TESTS": "ON"
+  },
+  "os": "macOS-26.5.1-arm64-arm-64bit",
+  "timestamp_iso": "2026-08-10T13:05:00.730261",
+  "notes": []
+}
