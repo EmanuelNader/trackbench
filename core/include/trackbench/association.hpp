@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -48,6 +50,10 @@ struct AssociateScratch {
   /// whole cost-matrix build so clipping allocates no per-pair vectors).
   std::vector<Vec2> clip_a;
   std::vector<Vec2> clip_b;
+  /// Spatial prefilter: linearized grid-cell key -> detection indices in that
+  /// cell. Buckets and per-cell vectors are kept across frames; the vectors
+  /// are cleared and refilled per frame so no per-frame allocation happens.
+  std::unordered_map<int64_t, std::vector<std::size_t>> grid;
 };
 
 /// Munkres / Hungarian minimization on a rectangular cost matrix.

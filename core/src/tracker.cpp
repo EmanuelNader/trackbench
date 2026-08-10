@@ -29,6 +29,7 @@ Tracker::Tracker(TrackerConfig config)
   associate_scratch_.matches.reserve(kInitialCapacity);
   associate_scratch_.clip_a.reserve(8);
   associate_scratch_.clip_b.reserve(8);
+  associate_scratch_.grid.reserve(kInitialCapacity);
 }
 
 FrameTracks Tracker::step(const FrameDetections& frame) {

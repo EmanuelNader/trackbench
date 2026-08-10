@@ -13,6 +13,15 @@
 namespace trackbench {
 namespace {
 
+/// Linearization factor for 2-D grid-cell keys: key = cx * kGridKeyScale + cy.
+/// Distinct (cx, cy) map to distinct int64 keys as long as |cy| < scale,
+/// which holds for any realistic coordinate range.
+constexpr int64_t kGridKeyScale = int64_t{1} << 32;
+
+int64_t grid_cell_key(int64_t cx, int64_t cy) {
+  return cx * kGridKeyScale + cy;
+}
+
 std::array<Vec2, 4> oriented_box_corners(double cx, double cy, double l,
                                          double w, double yaw) {
   const double hl = 0.5 * l;
@@ -416,55 +425,99 @@ void associate_to(const std::vector<Track>& tracks,
   {
     timing::ScopedTimer timer_cost(timings_ref,
                                    timing::StageTimings::COST_MATRIX_CONSTRUCT);
+
+    // Spatial prefilter (conservative, uniform grid over detection
+    // positions). For each track only the grid cells whose extent can
+    // intersect the track's Euclidean gate disk (radius cfg.gate_m) are
+    // visited, so every pair that can receive a finite cost is still
+    // evaluated while far pairs skip the per-pair gate. dist <= cfg.gate_m
+    // implies |det - track| <= cfg.gate_m per axis, and the 1e-6 m pad on the
+    // search radius is a strict superset of the exact gate predicate (covers
+    // floating-point boundary error), so the candidate set can only over-
+    // include. The per-pair gate below is unchanged and re-checks every
+    // candidate, making the resulting cost matrix (and the assignment)
+    // bit-identical to the full O(n_t x n_d) build.
+    auto& grid = scratch.grid;
+    for (auto& kv : grid) {
+      kv.second.clear();
+    }
+    grid.reserve(n_d);
+    const double R_grid = cfg.gate_m + 1e-6;
+    const double cell = 2.0 * R_grid;
+    for (std::size_t j = 0; j < n_d; ++j) {
+      const Detection& det = detections[j];
+      const int64_t cx = static_cast<int64_t>(std::floor(det.x / cell));
+      const int64_t cy = static_cast<int64_t>(std::floor(det.y / cell));
+      grid[grid_cell_key(cx, cy)].push_back(j);
+    }
+
     for (std::size_t i = 0; i < n_t; ++i) {
       const Track& tr = tracks[i];
       if (tr.state == TrackState::DEAD) {
         continue;
       }
-      for (std::size_t j = 0; j < n_d; ++j) {
-        const Detection& det = detections[j];
-        if (tr.cls != det.cls) {
-          continue;
-        }
-        const double dx = det.x - tr.x;
-        const double dy = det.y - tr.y;
-        const double dist = std::sqrt(dx * dx + dy * dy);
-        if (dist > cfg.gate_m) {
-          continue;
-        }
-        const double m2 = ekf.mahalanobis_pos_squared(tr, det);
-        if (!(m2 <= cfg.gate_mahalanobis)) {
-          continue;
-        }
+      const int64_t cx_min =
+          static_cast<int64_t>(std::floor((tr.x - R_grid) / cell));
+      const int64_t cx_max =
+          static_cast<int64_t>(std::floor((tr.x + R_grid) / cell));
+      const int64_t cy_min =
+          static_cast<int64_t>(std::floor((tr.y - R_grid) / cell));
+      const int64_t cy_max =
+          static_cast<int64_t>(std::floor((tr.y + R_grid) / cell));
+      for (int64_t cx = cx_min; cx <= cx_max; ++cx) {
+        for (int64_t cy = cy_min; cy <= cy_max; ++cy) {
+          auto it = grid.find(grid_cell_key(cx, cy));
+          if (it == grid.end()) {
+            continue;
+          }
+          for (const std::size_t j : it->second) {
+            const Detection& det = detections[j];
+            if (tr.cls != det.cls) {
+              continue;
+            }
+            const double dx = det.x - tr.x;
+            const double dy = det.y - tr.y;
+            const double dist = std::sqrt(dx * dx + dy * dy);
+            if (dist > cfg.gate_m) {
+              continue;
+            }
+            const double m2 = ekf.mahalanobis_pos_squared(tr, det);
+            if (!(m2 <= cfg.gate_mahalanobis)) {
+              continue;
+            }
 
-        // Soft velocity penalty (M6): prefer associations aligned with motion
-        // without hard-rejecting (hard gates increased IDS/FN on mini).
-        double cost_ij = m2;
-        const double speed = std::hypot(tr.vx, tr.vy);
-        if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed &&
-            cfg.vel_gate_lateral_m > 0.0 && cfg.vel_cost_weight > 0.0) {
-          const double ux = tr.vx / speed;
-          const double uy = tr.vy / speed;
-          const double lat = std::fabs(-uy * dx + ux * dy);
-          const double lat_n = lat / cfg.vel_gate_lateral_m;
-          cost_ij += cfg.vel_cost_weight * lat_n * lat_n;
-        }
+            // Soft velocity penalty (M6): prefer associations aligned with
+            // motion without hard-rejecting (hard gates increased IDS/FN on
+            // mini).
+            double cost_ij = m2;
+            const double speed = std::hypot(tr.vx, tr.vy);
+            if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed &&
+                cfg.vel_gate_lateral_m > 0.0 && cfg.vel_cost_weight > 0.0) {
+              const double ux = tr.vx / speed;
+              const double uy = tr.vy / speed;
+              const double lat = std::fabs(-uy * dx + ux * dy);
+              const double lat_n = lat / cfg.vel_gate_lateral_m;
+              cost_ij += cfg.vel_cost_weight * lat_n * lat_n;
+            }
 
-        // Soft BEV IoU term: prefer high-overlap boxes in dense parallel traffic.
-        if (cfg.iou_weight > 0.0) {
-          double tl = tr.l;
-          double tw = tr.w;
-          double dl = det.l;
-          double dw = det.w;
-          resolve_box_size(tr.cls, tl, tw);
-          resolve_box_size(det.cls, dl, dw);
-          const double iou = bev_oriented_iou_scratch(
-              tr.x, tr.y, tl, tw, tr.yaw, det.x, det.y, dl, dw, det.yaw,
-              scratch.clip_a, scratch.clip_b);
-          cost_ij += cfg.iou_weight * (1.0 - iou);
-        }
+            // Soft BEV IoU term: prefer high-overlap boxes in dense parallel
+            // traffic.
+            if (cfg.iou_weight > 0.0) {
+              double tl = tr.l;
+              double tw = tr.w;
+              double dl = det.l;
+              double dw = det.w;
+              resolve_box_size(tr.cls, tl, tw);
+              resolve_box_size(det.cls, dl, dw);
+              const double iou = bev_oriented_iou_scratch(
+                  tr.x, tr.y, tl, tw, tr.yaw, det.x, det.y, dl, dw, det.yaw,
+                  scratch.clip_a, scratch.clip_b);
+              cost_ij += cfg.iou_weight * (1.0 - iou);
+            }
 
-        cost[i][j] = cost_ij;
+            cost[i][j] = cost_ij;
+          }
+        }
       }
     }
   }
