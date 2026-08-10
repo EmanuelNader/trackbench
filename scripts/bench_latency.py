@@ -77,6 +77,12 @@ def main() -> int:
     )
     ap.add_argument("--config", default="core/config/default.json")
     ap.add_argument("--json-out", default="", help="optional path to copy timing.json")
+    ap.add_argument(
+        "--timing-csv",
+        default=None,
+        type=str,
+        help="optional per-frame stage timings CSV (requires TRACKBENCH_STAGE_TIMING build)",
+    )
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[1]
@@ -91,6 +97,10 @@ def main() -> int:
         dets = td_path / "detections.jsonl"
         tracks = td_path / "tracks.jsonl"
         timing = td_path / "timing.json"
+        if args.timing_csv:
+            timing_csv = Path(args.timing_csv).expanduser().resolve()
+        else:
+            timing_csv = td_path / "timing.csv"
         write_dense_dets(dets, frames=args.frames, n_dets=args.dets_per_frame)
         subprocess.run(
             [
@@ -103,14 +113,34 @@ def main() -> int:
                 str(tracks),
                 "--timing",
                 str(timing),
+                "--timing-csv",
+                str(timing_csv),
             ],
             check=True,
         )
-        payload = json.loads(timing.read_text(encoding="utf-8"))
-        if args.json_out:
-            Path(args.json_out).write_text(
-                json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+        payload = (
+            json.loads(timing.read_text(encoding="utf-8"))
+            if timing.is_file()
+            else None
+        )
+        if args.timing_csv and not timing_csv.is_file():
+            print(
+                "note: timing CSV not produced (binary may lack TRACKBENCH_STAGE_TIMING build)",
+                file=sys.stderr,
             )
+        if payload is not None and args.json_out:
+            out_json = dict(payload)
+            out_json["timing_csv"] = str(timing_csv) if timing_csv.is_file() else None
+            Path(args.json_out).write_text(
+                json.dumps(out_json, indent=2) + "\n", encoding="utf-8"
+            )
+
+    if payload is None:
+        print(
+            "note: timing.json not produced (binary exited before running); skipping summary",
+            file=sys.stderr,
+        )
+        return 0
 
     ms = sorted(float(x) for x in payload["ms_per_frame"])
     report = {
