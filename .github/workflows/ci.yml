@@ -32,6 +32,46 @@ jobs:
             --timing /tmp/timing_b.json
           diff -u /tmp/tracks_a.jsonl /tmp/tracks_b.jsonl
 
+  perf-stat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build deps
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libeigen3-dev
+      - name: Configure & build
+        run: |
+          cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release -DTRACKBENCH_BUILD_TESTS=OFF
+          cmake --build core/build -j$(nproc)
+      - name: Install perf (best-effort)
+        run: |
+          # linux-tools-generic may not match the runner kernel, and some runners
+          # need perf installed differently (e.g. linux-tools-<ver>-generic, or a
+          # binary at /usr/lib/linux-tools-$(uname -r)/perf). Install best-effort
+          # and tolerate failure so the job still attempts perf below.
+          sudo apt-get update
+          sudo apt-get install -y linux-tools-common linux-tools-generic "linux-tools-$(uname -r)" || true
+      - name: Generate dense synthetic detections
+        run: |
+          python3 -c "import sys; sys.path.insert(0,'scripts'); from pathlib import Path; from bench_latency import write_dense_dets; write_dense_dets(Path('/tmp/dets.jsonl'), frames=400, n_dets=40)"
+      - name: perf stat (informational)
+        continue-on-error: true
+        run: |
+          if command -v perf >/dev/null 2>&1; then
+            perf stat -e cycles,instructions,cache-references,cache-misses,branches,branch-misses,context-switches -- \
+              ./core/build/trackbench_run \
+              --dets /tmp/dets.jsonl \
+              --config core/config/default.json \
+              --out /tmp/tracks.jsonl \
+              --timing /tmp/timing.json \
+              2> /tmp/perf_stat.txt
+            echo "--- perf_stat.txt ---"
+            cat /tmp/perf_stat.txt
+          else
+            echo "perf not found on this runner (informational job, not a gate)."
+            echo "  some runners need perf installed via linux-tools-<ver>-generic"
+            echo "  or found at /usr/lib/linux-tools-\$(uname -r)/perf"
+          fi
+
   python:
     runs-on: ubuntu-latest
     steps:
