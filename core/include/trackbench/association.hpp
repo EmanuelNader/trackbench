@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <utility>
 #include <vector>
 
@@ -15,6 +17,39 @@ using Association = std::pair<std::size_t, std::size_t>;
 /// Large finite cost used as "infinity" in the assignment problem.
 constexpr double kCostInf = 1e9;
 
+/// 2-D point used for BEV polygon clipping.
+struct Vec2 {
+  double x = 0.0;
+  double y = 0.0;
+};
+
+/// Reusable per-frame scratch for the association stage.
+///
+/// The tracker is single-threaded; these buffers are reserved once and
+/// cleared/refilled per frame to avoid per-frame heap churn (cost matrix,
+/// Munkres working arrays, polygon clip buffers, match list).
+struct AssociateScratch {
+  /// n_t × n_d cost matrix for the current frame (kept intact so the
+  /// post-solve Inf/assignment rejection sees the pre-solve costs).
+  std::vector<std::vector<double>> cost;
+  /// Square-padded working copy of `cost`, mutated in place by Munkres.
+  std::vector<std::vector<double>> work;
+  /// Munkres working arrays (reused across solves/frames).
+  std::vector<int> row_star;
+  std::vector<int> col_star;
+  std::vector<int> row_prime;
+  std::vector<char> col_covered;
+  std::vector<char> row_covered;
+  /// Row → column assignment from the solve (after Inf rejection).
+  std::vector<int> assignment;
+  /// Matched (track, detection) pairs for the current frame.
+  std::vector<Association> matches;
+  /// Ping-pong polygon clip buffers for bev_oriented_iou (reused across the
+  /// whole cost-matrix build so clipping allocates no per-pair vectors).
+  std::vector<Vec2> clip_a;
+  std::vector<Vec2> clip_b;
+};
+
 /// Munkres / Hungarian minimization on a rectangular cost matrix.
 /// Returns column assignment for each row (-1 if unassigned / Inf cost).
 /// Stable tie-breaking: when costs (or zeros) tie, prefer lower row then
@@ -29,6 +64,17 @@ double bev_oriented_iou(double x1, double y1, double l1, double w1, double yaw1,
 /// Resolve BEV box size: use stored l/w when positive, else class defaults
 /// (pedestrian → 0.8×0.6; bicycle/motorcycle → 1.8×0.6; else 4.5×1.8).
 void resolve_box_size(const std::string& cls, double& l, double& w);
+
+/// Associate tracks to detections, reusing `scratch` for the cost matrix,
+/// the Hungarian working arrays and the match list. All other semantics match
+/// `associate` (see below); it writes the result into `scratch.matches`.
+/// If `timings` is non-null, the cost-matrix build and the Hungarian solve
+/// phases are timed into timings[StageTimings::COST_MATRIX_CONSTRUCT] and
+/// timings[StageTimings::ASSOCIATION_SOLVE].
+void associate_to(const std::vector<Track>& tracks,
+                  const std::vector<Detection>& detections, const Ekf& ekf,
+                  AssociateScratch& scratch,
+                  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings);
 
 /// Associate tracks to detections.
 /// Cost = squared Mahalanobis + soft lateral-velocity penalty

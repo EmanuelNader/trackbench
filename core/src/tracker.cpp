@@ -11,7 +11,25 @@
 namespace trackbench {
 
 Tracker::Tracker(TrackerConfig config)
-    : config_(std::move(config)), ekf_(config_) {}
+    : config_(std::move(config)), ekf_(config_) {
+  // Reserve per-frame scratch buffers once (grow lazily past this hint).
+  constexpr std::size_t kInitialCapacity = 64;
+  active_.reserve(kInitialCapacity);
+  active_idx_.reserve(kInitialCapacity);
+  track_matched_.reserve(kInitialCapacity);
+  det_matched_.reserve(kInitialCapacity);
+  associate_scratch_.cost.reserve(kInitialCapacity);
+  associate_scratch_.work.reserve(kInitialCapacity);
+  associate_scratch_.row_star.reserve(kInitialCapacity);
+  associate_scratch_.col_star.reserve(kInitialCapacity);
+  associate_scratch_.row_prime.reserve(kInitialCapacity);
+  associate_scratch_.col_covered.reserve(kInitialCapacity);
+  associate_scratch_.row_covered.reserve(kInitialCapacity);
+  associate_scratch_.assignment.reserve(kInitialCapacity);
+  associate_scratch_.matches.reserve(kInitialCapacity);
+  associate_scratch_.clip_a.reserve(8);
+  associate_scratch_.clip_b.reserve(8);
+}
 
 FrameTracks Tracker::step(const FrameDetections& frame) {
   std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)> stage_ns{};
@@ -54,28 +72,28 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
     }
 
     // Build index list of active tracks (same order as tracks_).
-    std::vector<std::size_t> active_idx;
-    std::vector<Track> active;
     {
 #ifdef TRACKBENCH_STAGE_TIMING
       timing::ScopedTimer timer_build_active(stage_ns, timing::StageTimings::BUILD_ACTIVE);
 #endif
-      active_idx.reserve(tracks_.size());
-      active.reserve(tracks_.size());
+      active_idx_.clear();
+      active_.clear();
+      active_idx_.reserve(tracks_.size());
+      active_.reserve(tracks_.size());
       for (std::size_t i = 0; i < tracks_.size(); ++i) {
         if (tracks_[i].state != TrackState::DEAD) {
-          active_idx.push_back(i);
-          active.push_back(tracks_[i]);
+          active_idx_.push_back(i);
+          active_.push_back(tracks_[i]);
         }
       }
     }
 
     // 2-3. Associate (cost-matrix build + Hungarian solve timed inside).
-    const std::vector<Association> matches =
-        associate(active, frame.detections, ekf_, &stage_ns);
+    associate_to(active_, frame.detections, ekf_, associate_scratch_, &stage_ns);
+    const std::vector<Association>& matches = associate_scratch_.matches;
 
-    std::vector<char> track_matched(active.size(), 0);
-    std::vector<char> det_matched(frame.detections.size(), 0);
+    track_matched_.assign(active_.size(), 0);
+    det_matched_.assign(frame.detections.size(), 0);
 
     // 4. Matched -> EKF update + hit.
     {
@@ -85,9 +103,9 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
       for (const Association& m : matches) {
         const std::size_t ai = m.first;
         const std::size_t di = m.second;
-        track_matched[ai] = 1;
-        det_matched[di] = 1;
-        Track& tr = tracks_[active_idx[ai]];
+        track_matched_[ai] = 1;
+        det_matched_[di] = 1;
+        Track& tr = tracks_[active_idx_[ai]];
         ekf_.update(tr, frame.detections[di]);
         mark_hit(tr, config_.promote_hits);
       }
@@ -100,7 +118,7 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
       timing::ScopedTimer timer_birth(stage_ns, timing::StageTimings::BIRTH);
 #endif
       for (std::size_t j = 0; j < frame.detections.size(); ++j) {
-        if (det_matched[j]) {
+        if (det_matched_[j]) {
           continue;
         }
         if (frame.detections[j].score < config_.min_birth_score) {
@@ -117,11 +135,11 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
 #ifdef TRACKBENCH_STAGE_TIMING
       timing::ScopedTimer timer_coast_kill(stage_ns, timing::StageTimings::COAST_KILL);
 #endif
-      for (std::size_t ai = 0; ai < active.size(); ++ai) {
-        if (track_matched[ai]) {
+      for (std::size_t ai = 0; ai < active_.size(); ++ai) {
+        if (track_matched_[ai]) {
           continue;
         }
-        mark_miss(tracks_[active_idx[ai]], config_.coast_frames);
+        mark_miss(tracks_[active_idx_[ai]], config_.coast_frames);
       }
     }
 
