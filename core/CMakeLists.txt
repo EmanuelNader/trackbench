@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Default ON so Debug/CI builds get GoogleTest without extra flags.
 option(TRACKBENCH_BUILD_TESTS "Build GoogleTest unit tests" ON)
+option(TRACKBENCH_STAGE_TIMING "Enable per-stage timing instrumentation" OFF)
 
 include(FetchContent)
 
@@ -38,6 +39,9 @@ target_include_directories(trackbench
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+if(TRACKBENCH_STAGE_TIMING)
+  target_compile_definitions(trackbench PUBLIC TRACKBENCH_STAGE_TIMING)
+endif()
 target_link_libraries(trackbench
   PUBLIC
     Eigen3::Eigen
@@ -85,5 +89,8 @@ if(TRACKBENCH_BUILD_TESTS)
       TRACKBENCH_FIXTURE_DIR="${TRACKBENCH_FIXTURE_DIR}"
       TRACKBENCH_CONFIG_PATH="${TRACKBENCH_CONFIG_PATH}"
   )
+  if(TRACKBENCH_STAGE_TIMING)
+    target_compile_definitions(trackbench_tests PRIVATE TRACKBENCH_STAGE_TIMING)
+  endif()
   add_test(NAME trackbench_unit COMMAND trackbench_tests)
 endif()
