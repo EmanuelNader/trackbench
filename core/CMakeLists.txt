@@ -71,6 +71,7 @@ if(TRACKBENCH_BUILD_TESTS)
 
   add_executable(trackbench_tests
     tests/test_smoke.cpp
+    tests/test_timed_smoke.cpp
     tests/test_ekf.cpp
     tests/test_hungarian.cpp
     tests/test_lifecycle.cpp
