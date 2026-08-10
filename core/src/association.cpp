@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "trackbench/timing.hpp"
+
 namespace trackbench {
 namespace {
 
@@ -352,7 +354,8 @@ std::vector<int> hungarian_minimize(
 
 std::vector<Association> associate(const std::vector<Track>& tracks,
                                    const std::vector<Detection>& detections,
-                                   const Ekf& ekf) {
+                                   const Ekf& ekf,
+                                   std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings) {
   std::vector<Association> matches;
   if (tracks.empty() || detections.empty()) {
     return matches;
@@ -365,59 +368,77 @@ std::vector<Association> associate(const std::vector<Track>& tracks,
   std::vector<std::vector<double>> cost(
       n_t, std::vector<double>(n_d, kCostInf));
 
-  for (std::size_t i = 0; i < n_t; ++i) {
-    const Track& tr = tracks[i];
-    if (tr.state == TrackState::DEAD) {
-      continue;
-    }
-    for (std::size_t j = 0; j < n_d; ++j) {
-      const Detection& det = detections[j];
-      if (tr.cls != det.cls) {
+  // Time the gated cost-matrix build and the Hungarian solve into *timings
+  // when provided. ScopedTimer is a no-op when TRACKBENCH_STAGE_TIMING is off;
+  // the local fallback array keeps a null timings pointer well-defined.
+  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>
+      dummy_timings{};
+  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>&
+      timings_ref = timings ? *timings : dummy_timings;
+
+  {
+    timing::ScopedTimer timer_cost(timings_ref,
+                                   timing::StageTimings::COST_MATRIX_CONSTRUCT);
+    for (std::size_t i = 0; i < n_t; ++i) {
+      const Track& tr = tracks[i];
+      if (tr.state == TrackState::DEAD) {
         continue;
       }
-      const double dx = det.x - tr.x;
-      const double dy = det.y - tr.y;
-      const double dist = std::sqrt(dx * dx + dy * dy);
-      if (dist > cfg.gate_m) {
-        continue;
-      }
-      const double m2 = ekf.mahalanobis_pos_squared(tr, det);
-      if (!(m2 <= cfg.gate_mahalanobis)) {
-        continue;
-      }
+      for (std::size_t j = 0; j < n_d; ++j) {
+        const Detection& det = detections[j];
+        if (tr.cls != det.cls) {
+          continue;
+        }
+        const double dx = det.x - tr.x;
+        const double dy = det.y - tr.y;
+        const double dist = std::sqrt(dx * dx + dy * dy);
+        if (dist > cfg.gate_m) {
+          continue;
+        }
+        const double m2 = ekf.mahalanobis_pos_squared(tr, det);
+        if (!(m2 <= cfg.gate_mahalanobis)) {
+          continue;
+        }
 
-      // Soft velocity penalty (M6): prefer associations aligned with motion
-      // without hard-rejecting (hard gates increased IDS/FN on mini).
-      double cost_ij = m2;
-      const double speed = std::hypot(tr.vx, tr.vy);
-      if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed &&
-          cfg.vel_gate_lateral_m > 0.0 && cfg.vel_cost_weight > 0.0) {
-        const double ux = tr.vx / speed;
-        const double uy = tr.vy / speed;
-        const double lat = std::fabs(-uy * dx + ux * dy);
-        const double lat_n = lat / cfg.vel_gate_lateral_m;
-        cost_ij += cfg.vel_cost_weight * lat_n * lat_n;
-      }
+        // Soft velocity penalty (M6): prefer associations aligned with motion
+        // without hard-rejecting (hard gates increased IDS/FN on mini).
+        double cost_ij = m2;
+        const double speed = std::hypot(tr.vx, tr.vy);
+        if (tr.hits >= 2 && speed >= cfg.vel_gate_min_speed &&
+            cfg.vel_gate_lateral_m > 0.0 && cfg.vel_cost_weight > 0.0) {
+          const double ux = tr.vx / speed;
+          const double uy = tr.vy / speed;
+          const double lat = std::fabs(-uy * dx + ux * dy);
+          const double lat_n = lat / cfg.vel_gate_lateral_m;
+          cost_ij += cfg.vel_cost_weight * lat_n * lat_n;
+        }
 
-      // Soft BEV IoU term: prefer high-overlap boxes in dense parallel traffic.
-      if (cfg.iou_weight > 0.0) {
-        double tl = tr.l;
-        double tw = tr.w;
-        double dl = det.l;
-        double dw = det.w;
-        resolve_box_size(tr.cls, tl, tw);
-        resolve_box_size(det.cls, dl, dw);
-        const double iou =
-            bev_oriented_iou(tr.x, tr.y, tl, tw, tr.yaw, det.x, det.y, dl, dw,
-                             det.yaw);
-        cost_ij += cfg.iou_weight * (1.0 - iou);
-      }
+        // Soft BEV IoU term: prefer high-overlap boxes in dense parallel traffic.
+        if (cfg.iou_weight > 0.0) {
+          double tl = tr.l;
+          double tw = tr.w;
+          double dl = det.l;
+          double dw = det.w;
+          resolve_box_size(tr.cls, tl, tw);
+          resolve_box_size(det.cls, dl, dw);
+          const double iou =
+              bev_oriented_iou(tr.x, tr.y, tl, tw, tr.yaw, det.x, det.y, dl, dw,
+                               det.yaw);
+          cost_ij += cfg.iou_weight * (1.0 - iou);
+        }
 
-      cost[i][j] = cost_ij;
+        cost[i][j] = cost_ij;
+      }
     }
   }
 
-  const std::vector<int> assignment = hungarian_minimize(cost);
+  std::vector<int> assignment;
+  {
+    timing::ScopedTimer timer_solve(timings_ref,
+                                    timing::StageTimings::ASSOCIATION_SOLVE);
+    assignment = hungarian_minimize(cost);
+  }
+
   matches.reserve(n_t);
   for (std::size_t i = 0; i < assignment.size(); ++i) {
     const int j = assignment[i];

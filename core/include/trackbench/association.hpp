@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "trackbench/ekf.hpp"
+#include "trackbench/timing.hpp"
 #include "trackbench/types.hpp"
 
 namespace trackbench {
@@ -36,9 +37,13 @@ void resolve_box_size(const std::string& cls, double& l, double& w);
 /// squared Mahalanobis <= gate_mahalanobis.
 /// Determinism: tracks are matched in caller order; ties broken by
 /// (track id via row order, detection index).
+/// If `timings` is non-null, the cost-matrix build and the Hungarian solve
+/// phases are timed into timings[StageTimings::COST_MATRIX_CONSTRUCT] and
+/// timings[StageTimings::ASSOCIATION_SOLVE].
 std::vector<Association> associate(
     const std::vector<Track>& tracks,
     const std::vector<Detection>& detections,
-    const Ekf& ekf);
+    const Ekf& ekf,
+    std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings = nullptr);
 
 }  // namespace trackbench
