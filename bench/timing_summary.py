@@ -11,6 +11,9 @@ import argparse
 import sys
 from pathlib import Path
 
+# Producer contract: must byte-match the CSV header written by
+# core/src/main.cpp (trackbench_run --timing-csv). Keep in sync if the
+# producer changes its column set or ordering.
 EXPECTED_HEADER = (
     "frame,scene_id,n_active,n_dets,dt_ns,predict_ns,"
     "build_active_ns,cost_matrix_construct_ns,association_solve_ns,"
