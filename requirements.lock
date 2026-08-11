@@ -7,6 +7,8 @@
 # pyquaternion / scipy are ingest & devkit concerns (requirements-full.txt) and
 # are not imported by eval/ or scripts/; eval/db.py's psycopg is an optional
 # lazy import only used by --write-db, not by the sweep.
+# tomli -> TOML manifest parsing on Py<3.11 (bench/ablation/manifest.toml).
 #
 # Install:  python -m pip install -r requirements.lock
 numpy==1.26.4
+tomli==2.4.1

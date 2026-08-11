@@ -18,11 +18,24 @@
 # tracker build       = Release (TRACKBENCH_STAGE_TIMING=OFF, -O3)
 # seed                = 0, constant across all cells
 # python              = 3.9.6 (eval stack pinned in requirements.lock:
-#                       numpy==1.26.4)
+#                       numpy==1.26.4, tomli==2.4.1)
 #
-# NOTE: this file currently records the header + meta only. The 24-cell grid,
-# named reference cells (baseline / post001 / post002 / post003), and expected
-# landmarks (890 / 618 / 619 / 415) are added by the plan's Task 2.
+# ── Grid ───────────────────────────────────────────────────────────────────
+# Full factorial over four knobs (2 × 2 × 2 × 3 = 24 cells); everything else
+# is constant at the post-003 values in [defaults]. A materialized cell is
+# [defaults] + one (gate_m, vel_cost_weight, iou_weight, min_birth_score)
+# combination, so every config carries the full key set of the C++ loader
+# (a missing key would silently default).
+#
+# The cross product iterates [grid].levels in insertion order, the last knob
+# varying fastest. Each of the 24 cells carries a human-readable label:
+#   g{gate_m}-v{vel_cost_weight}-i{iou_weight}-b{min_birth_score}
+# e.g. g1.5-v4.0-i2.0-b0.7 == post003. Named reference cells in [reference]
+# reuse their key as the label and must map onto one of the 24 combos
+# (verified by the materialization gate).
+#
+# Expected total IDS landmarks for the stacked sequence (Task 5 gate: ±20):
+#   baseline 890 -> post001 618 -> post002 619 -> post003 415
 
 [meta]
 split = "nuScenes v1.0-mini"
@@ -38,7 +51,58 @@ tracker_build_opt = "-O3"
 seed = 0
 python_version = "3.9.6"
 eval_stack = "requirements.lock"
-eval_stack_pins = ["numpy==1.26.4"]
+eval_stack_pins = ["numpy==1.26.4", "tomli==2.4.1"]
 
 [meta.status]
-grid_cells = "added by the plan's Task 2"
+grid_cells = 24
+reference_cells = ["baseline", "post001", "post002", "post003"]
+aliases = { current = "post003" }
+# Knobs excluded from the grid (not implemented in the tracker): association
+# algorithm (greedy/JV) and motion model (CTRV) — see plan "Out of scope".
+
+[defaults]
+promote_hits = 3
+coast_frames = 5
+gate_mahalanobis = 9.21
+vel_gate_min_speed = 1.0
+vel_gate_lateral_m = 1.0
+seed = 0
+process_var_pos = 1.0
+process_var_vel = 1.0
+process_var_yaw = 0.1
+meas_var_pos = 0.5
+meas_var_yaw = 0.1
+
+[grid]
+levels = {
+  gate_m          = [2.0, 1.5],
+  vel_cost_weight = [0.0, 4.0],
+  iou_weight      = [0.0, 2.0],
+  min_birth_score = [0.0, 0.5, 0.7],
+}
+
+[reference]
+baseline = { gate_m = 2.0, vel_cost_weight = 0.0, iou_weight = 0.0, min_birth_score = 0.0 }
+post001  = { gate_m = 1.5, vel_cost_weight = 4.0, iou_weight = 0.0, min_birth_score = 0.5 }
+post002  = { gate_m = 1.5, vel_cost_weight = 4.0, iou_weight = 2.0, min_birth_score = 0.5 }
+post003  = { gate_m = 1.5, vel_cost_weight = 4.0, iou_weight = 2.0, min_birth_score = 0.7 }
+alias    = { current = "post003" }
+
+[landmarks]
+tolerance_ids = 20
+
+[landmarks.baseline]
+expected_ids = 890
+source = "docs/findings/001-dense-id-switch-velocity-gate.md"
+
+[landmarks.post001]
+expected_ids = 618
+source = "docs/findings/001-dense-id-switch-velocity-gate.md"
+
+[landmarks.post002]
+expected_ids = 619
+source = "docs/findings/003-harder-birth-score.md"
+
+[landmarks.post003]
+expected_ids = 415
+source = "docs/findings/003-harder-birth-score.md"
