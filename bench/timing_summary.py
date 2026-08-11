@@ -74,7 +74,30 @@ def read_rows(path: Path) -> tuple[str, list[list[str]]]:
             f"  expected: {EXPECTED_HEADER}\n"
             f"  got:      {header}"
         )
-    return header, [ln.split(",") for ln in lines[1:]]
+    columns = header.split(",")
+    parse_cols = [
+        ("frame", columns.index("frame")),
+        ("scene_id", columns.index("scene_id")),
+        *[(name, columns.index(name)) for name in STAGE_COLUMNS],
+    ]
+    rows = []
+    for line_no, ln in enumerate(lines[1:], start=2):
+        fields = ln.split(",")
+        if len(fields) != len(columns):
+            raise ValueError(
+                f"{path}:{line_no}: expected {len(columns)} columns, got "
+                f"{len(fields)}: {ln}"
+            )
+        for label, idx in parse_cols:
+            try:
+                int(fields[idx])
+            except ValueError:
+                raise ValueError(
+                    f"{path}:{line_no}: non-integer {label} "
+                    f"({fields[idx]!r}): {ln}"
+                )
+        rows.append(fields)
+    return header, rows
 
 
 def build_report(
@@ -89,10 +112,7 @@ def build_report(
 
     by_scene: dict[int, list[list[str]]] = {}
     for row in rows:
-        try:
-            scene_id = int(row[columns.index("scene_id")])
-        except ValueError:
-            raise ValueError(f"non-integer scene_id in row: {row}")
+        scene_id = int(row[columns.index("scene_id")])
         by_scene.setdefault(scene_id, []).append(row)
 
     # The CSV producer currently writes scene_id = input frame number as a
@@ -125,11 +145,7 @@ def build_report(
     per_stage: dict[str, list[int]] = {}
     for row in sampled:
         for stage, col in zip(STAGE_ORDER, STAGE_COLUMNS):
-            try:
-                val = int(row[stage_col_idx[col]])
-            except ValueError:
-                raise ValueError(f"non-integer {col} in row: {row}")
-            per_stage.setdefault(stage, []).append(val)
+            per_stage.setdefault(stage, []).append(int(row[stage_col_idx[col]]))
     for stage in STAGE_ORDER:
         per_stage[stage].sort()
 
