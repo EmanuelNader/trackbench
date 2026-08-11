@@ -143,9 +143,13 @@ int main(int argc, char** argv) {
              "update_ns,birth_ns,coast_kill_ns,compact_ns,sort_emit_ns,"
              "total_ns\n";
       const auto& ft = tracker.frame_timings();
-      for (size_t i = 0; i < ft.size() && i < frames.size(); ++i) {
-        csv << i << ',' << frames[i].frame << ','
-            << outs[i].tracks.size() << ',' << frames[i].detections.size();
+      // frame_timings() may hold only the recent tail (capped at 4096 entries);
+      // align ft[i] with its actual source frame when frames.size() > ft.size().
+      const size_t off = (frames.size() > ft.size()) ? (frames.size() - ft.size()) : 0;
+      for (size_t i = 0; i < ft.size(); ++i) {
+        const size_t fi = off + i;
+        csv << i << ',' << frames[fi].frame << ','
+            << outs[fi].tracks.size() << ',' << frames[fi].detections.size();
         const auto& fti = ft[i];
         for (const auto st : kStageColumns) {
           csv << ',' << fti[static_cast<size_t>(st)];
