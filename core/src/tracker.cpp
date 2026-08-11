@@ -33,7 +33,9 @@ Tracker::Tracker(TrackerConfig config)
 }
 
 FrameTracks Tracker::step(const FrameDetections& frame) {
+#ifdef TRACKBENCH_STAGE_TIMING
   std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)> stage_ns{};
+#endif
 
   FrameTracks out;
   {
@@ -90,7 +92,11 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
     }
 
     // 2-3. Associate (cost-matrix build + Hungarian solve timed inside).
+#ifdef TRACKBENCH_STAGE_TIMING
     associate_to(active_, frame.detections, ekf_, associate_scratch_, &stage_ns);
+#else
+    associate_to(active_, frame.detections, ekf_, associate_scratch_, nullptr);
+#endif
     const std::vector<Association>& matches = associate_scratch_.matches;
 
     track_matched_.assign(active_.size(), 0);
