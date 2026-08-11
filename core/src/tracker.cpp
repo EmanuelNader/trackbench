@@ -182,6 +182,12 @@ FrameTracks Tracker::step(const FrameDetections& frame) {
   }
 
 #ifdef TRACKBENCH_STAGE_TIMING
+  // Cap the retained window to keep memory bounded on long runs; only the
+  // most recent frames are kept (the CSV writer reads the tail).
+  static constexpr std::size_t kMaxFrameTimings = 4096;
+  if (frame_timings_.size() == kMaxFrameTimings) {
+    frame_timings_.erase(frame_timings_.begin());
+  }
   frame_timings_.push_back(stage_ns);
 #endif
   return out;
