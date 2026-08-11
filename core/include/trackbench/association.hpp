@@ -80,7 +80,7 @@ void resolve_box_size(const std::string& cls, double& l, double& w);
 void associate_to(const std::vector<Track>& tracks,
                   const std::vector<Detection>& detections, const Ekf& ekf,
                   AssociateScratch& scratch,
-                  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings);
+                  timing::StageNs* timings);
 
 /// Associate tracks to detections.
 /// Cost = squared Mahalanobis + soft lateral-velocity penalty
@@ -96,6 +96,6 @@ std::vector<Association> associate(
     const std::vector<Track>& tracks,
     const std::vector<Detection>& detections,
     const Ekf& ekf,
-    std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings = nullptr);
+    timing::StageNs* timings = nullptr);
 
 }  // namespace trackbench

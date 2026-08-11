@@ -34,7 +34,7 @@ Tracker::Tracker(TrackerConfig config)
 
 FrameTracks Tracker::step(const FrameDetections& frame) {
 #ifdef TRACKBENCH_STAGE_TIMING
-  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)> stage_ns{};
+  timing::StageNs stage_ns{};
 #endif
 
   FrameTracks out;

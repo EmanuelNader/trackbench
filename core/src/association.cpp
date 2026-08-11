@@ -396,7 +396,7 @@ std::vector<int> hungarian_minimize(
 void associate_to(const std::vector<Track>& tracks,
                   const std::vector<Detection>& detections, const Ekf& ekf,
                   AssociateScratch& scratch,
-                  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings) {
+                                   timing::StageNs* timings) {
   auto& matches = scratch.matches;
   matches.clear();
   if (tracks.empty() || detections.empty()) {
@@ -417,10 +417,8 @@ void associate_to(const std::vector<Track>& tracks,
   // Time the gated cost-matrix build and the Hungarian solve into *timings
   // when provided. ScopedTimer is a no-op when TRACKBENCH_STAGE_TIMING is off;
   // the local fallback array keeps a null timings pointer well-defined.
-  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>
-      dummy_timings{};
-  std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>&
-      timings_ref = timings ? *timings : dummy_timings;
+  timing::StageNs dummy_timings{};
+  timing::StageNs& timings_ref = timings ? *timings : dummy_timings;
 
   {
     timing::ScopedTimer timer_cost(timings_ref,
@@ -562,7 +560,7 @@ void associate_to(const std::vector<Track>& tracks,
 std::vector<Association> associate(const std::vector<Track>& tracks,
                                    const std::vector<Detection>& detections,
                                    const Ekf& ekf,
-                                   std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>* timings) {
+                  timing::StageNs* timings) {
   AssociateScratch scratch;
   associate_to(tracks, detections, ekf, scratch, timings);
   return std::move(scratch.matches);

@@ -22,12 +22,14 @@ enum class StageTimings : uint8_t {
   COUNT
 };
 
+/// Per-frame stage timing accumulator, indexed by StageTimings (ns).
+using StageNs = std::array<uint64_t, static_cast<size_t>(StageTimings::COUNT)>;
+
 #ifdef TRACKBENCH_STAGE_TIMING
 
 class ScopedTimer {
  public:
-  explicit ScopedTimer(std::array<uint64_t, static_cast<size_t>(StageTimings::COUNT)>& timings,
-                       StageTimings stage)
+  explicit ScopedTimer(StageNs& timings, StageTimings stage)
       : timings_(timings), stage_(stage), start_(std::chrono::steady_clock::now()) {}
 
   ~ScopedTimer() {
@@ -43,7 +45,7 @@ class ScopedTimer {
   ScopedTimer& operator=(ScopedTimer&&) = delete;
 
  private:
-  std::array<uint64_t, static_cast<size_t>(StageTimings::COUNT)>& timings_;
+  StageNs& timings_;
   StageTimings stage_;
   std::chrono::steady_clock::time_point start_;
 };
@@ -51,8 +53,7 @@ class ScopedTimer {
 #else
 
 struct ScopedTimer {
-  explicit ScopedTimer(std::array<uint64_t, static_cast<size_t>(StageTimings::COUNT)>&,
-                       StageTimings) {}
+  explicit ScopedTimer(StageNs&, StageTimings) {}
   ~ScopedTimer() = default;
   ScopedTimer(const ScopedTimer&) = delete;
   ScopedTimer& operator=(const ScopedTimer&) = delete;

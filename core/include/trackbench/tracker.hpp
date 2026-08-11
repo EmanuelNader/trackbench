@@ -40,7 +40,7 @@ class Tracker {
   AssociateScratch associate_scratch_;
 
 #ifdef TRACKBENCH_STAGE_TIMING
-  std::vector<std::array<uint64_t, static_cast<size_t>(timing::StageTimings::COUNT)>> frame_timings_;
+  std::vector<timing::StageNs> frame_timings_;
 #endif
 };
 
