@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
              "update_ns,birth_ns,coast_kill_ns,compact_ns,sort_emit_ns,"
              "total_ns\n";
       const auto& ft = tracker.frame_timings();
-      for (size_t i = 0; i < frames.size(); ++i) {
+      for (size_t i = 0; i < ft.size() && i < frames.size(); ++i) {
         csv << i << ',' << frames[i].frame << ','
             << outs[i].tracks.size() << ',' << frames[i].detections.size();
         const auto& fti = ft[i];
@@ -153,6 +153,10 @@ int main(int argc, char** argv) {
         csv << '\n';
       }
       csv.close();
+      if (!csv) {
+        throw std::runtime_error("failed to flush --timing-csv file: " +
+                                 timing_csv_path);
+      }
     }
 #endif
   } catch (const std::exception& e) {
