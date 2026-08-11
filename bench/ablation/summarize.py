@@ -8,6 +8,12 @@ matrix, marginal table (each knob alone off baseline), stacked tables (finding
 order + per-component path), and script-computed interaction notes. Every
 number traces to a cell output file. The four reference landmarks are asserted
 within manifest tolerance; any violation prints an error and exits non-zero.
+A hand-written `## Analysis` section in the existing output file (heading to
+EOF) is preserved verbatim across regeneration, so a human's prose survives
+re-running the script; when no such section exists, a trailing `## Analysis`
+placeholder heading is appended so the section is ready for the human. Output
+is deterministic: the same out/ and the same existing output file always
+regenerate the same bytes.
 
 Usage:
   python3 bench/ablation/summarize.py [--out PATH]
@@ -371,6 +377,17 @@ def build_report(manifest: dict, cells_by_label: dict, refs: dict, summaries: di
     return "\n".join(lines) + "\n", violations
 
 
+def preserved_analysis(path: Path) -> str | None:
+    """Return the existing `## Analysis` section (heading to EOF) verbatim, or None if absent."""
+    if not path.is_file():
+        return None
+    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        if line.rstrip("\r\n") == "## Analysis":
+            return "".join(lines[i:])
+    return None
+
+
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
         prog="python3 bench/ablation/summarize.py",
@@ -437,6 +454,12 @@ def main(argv: list[str] | None = None) -> int:
     except KeyError as e:
         print(f"error: malformed summary.json — missing key {e}", file=sys.stderr)
         return 1
+
+    preserved = preserved_analysis(Path(args.out))
+    if preserved is None:
+        report = report + "## Analysis\n\n"
+    else:
+        report = report + preserved
 
     Path(args.out).write_text(report, encoding="utf-8")
     print(f"wrote {args.out}", file=sys.stderr)

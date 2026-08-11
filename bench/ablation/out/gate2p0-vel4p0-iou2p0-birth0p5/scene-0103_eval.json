@@ -1,0 +1,367 @@
+{
+  "clusters": [
+    {
+      "bucket": "late_init_far",
+      "event_ids": [
+        "0:LATE_INIT:f2:gt8096b5ad8e334c2eabffca9cf3bbf08a:trNone",
+        "1:LATE_INIT:f2:gtf3995943006145ca8a7bc375527f0aba:trNone",
+        "3:LATE_INIT:f3:gtc283b224a9984736bff67a2f347866fa:tr7",
+        "4:LATE_INIT:f4:gt9439a24131dc4e1faa3b5b73f518f1da:trNone",
+        "9:LATE_INIT:f9:gtf1335e8d0b7c40988d9ab522b5993d3d:trNone",
+        "10:LATE_INIT:f11:gte73ba8faf67d40c8b6b653489393ef8b:trNone",
+        "13:LATE_INIT:f14:gt2ef4b4d20b064d34b754f68e48f5a5c2:trNone",
+        "14:LATE_INIT:f14:gt48d06a263b314b48bd41343ea5f5d158:trNone",
+        "15:LATE_INIT:f14:gt84755505e70547af890aff9db860f692:trNone",
+        "19:LATE_INIT:f15:gt06ff24b7f1e8479b934f1b74348028bc:tr125",
+        "21:LATE_INIT:f15:gt8ce4fe54af77467d90c840465f69677f:trNone",
+        "29:LATE_INIT:f18:gt377df4ee88ec46c9be892080557263f6:trNone",
+        "31:LATE_INIT:f19:gt143ecd5e93614768bdb3da695e76c409:trNone",
+        "32:LATE_INIT:f19:gt2a42fd0e123c455fbaeb1c5f03dba0b2:trNone",
+        "33:LATE_INIT:f19:gt68dbf490d231446f92fa7dbd366c8b93:trNone",
+        "34:LATE_INIT:f19:gt7581fd7e9c0f426cb0efb9ea1f3f2830:trNone",
+        "37:LATE_INIT:f19:gtf5c0c1968ef0486cb3183e521841352f:trNone",
+        "42:LATE_INIT:f21:gtf7f666bf92c049bea8fabc42a8831005:trNone",
+        "43:LATE_INIT:f22:gt349232409f354033b215b5e37c3312ab:trNone",
+        "44:LATE_INIT:f22:gt898c8b3c29d64d80806dd5e5fc6c02d3:trNone",
+        "46:LATE_INIT:f23:gtec0e6425eae2442698ff7b43d405d279:trNone",
+        "50:LATE_INIT:f24:gt802bbdc22d21477f8803a39a5e7e98bf:trNone",
+        "54:LATE_INIT:f26:gtdb7d65690f2e412e887468596e2ddabf:tr156",
+        "57:LATE_INIT:f28:gt96c353e8f14d4a63ba2b844d43cffc42:tr156",
+        "62:LATE_INIT:f29:gtf2d9e6f194ee446eafc7a79fcb32994a:trNone",
+        "64:LATE_INIT:f30:gt1e4a740fd22b44dda3eed861e6e3f170:tr156",
+        "71:LATE_INIT:f33:gt1f8d7e8410ed435da374688590a13b0a:tr156",
+        "75:LATE_INIT:f35:gt007842c92eaf4351b5a9678f7e7094f3:trNone",
+        "76:LATE_INIT:f35:gtebb251e1e8b144c697dc28c22bb44b13:trNone",
+        "88:LATE_INIT:f37:gtab820b691d3446ea889a70cd429cd931:trNone"
+      ],
+      "event_indices": [
+        0,
+        1,
+        3,
+        4,
+        9,
+        10,
+        13,
+        14,
+        15,
+        19,
+        21,
+        29,
+        31,
+        32,
+        33,
+        34,
+        37,
+        42,
+        43,
+        44,
+        46,
+        50,
+        54,
+        57,
+        62,
+        64,
+        71,
+        75,
+        76,
+        88
+      ],
+      "label": "Late track initialization at far range",
+      "size": 30,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 30
+        },
+        "mean_duration_frames": 16.2,
+        "mean_neighbor_count_5m": 0.3,
+        "mean_range_m": 52.46444020805134,
+        "mean_severity": 0.8366666666666667,
+        "n": 30,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "other_late_init",
+      "event_ids": [
+        "2:LATE_INIT:f3:gt9c5151b34911482f8155ab55c3f5d32f:trNone",
+        "8:LATE_INIT:f9:gtc7bb896c68f748c9b735ca9df26435de:trNone",
+        "18:LATE_INIT:f15:gt045cd82a77a1472499e8c15100cb5ff3:tr123",
+        "20:LATE_INIT:f15:gt3620feb00d744241a94855f3a8913a78:tr121",
+        "22:LATE_INIT:f15:gtd0f5aace57684923b8a44b554b006fb2:tr120",
+        "24:LATE_INIT:f16:gt6346de1c47584b34833d6df500d2ed6c:tr131",
+        "25:LATE_INIT:f16:gtdc762bf1bc694d3e8141bf592f9b1456:tr129",
+        "26:LATE_INIT:f16:gtdce1fda2d70945c792dcc27074ec6aa9:tr128",
+        "30:LATE_INIT:f19:gt0bfc7d407d09490cba7ac57897fcb100:tr142",
+        "35:LATE_INIT:f19:gt9e5f09bc19cd473dae219194ada64f3d:tr143",
+        "36:LATE_INIT:f19:gteaaf60765ee8478f8e0bd4942571c6fb:tr141",
+        "47:LATE_INIT:f23:gtf4af7fd215ee47aa8b64bac0443d7be8:tr149",
+        "49:LATE_INIT:f24:gt713b6bedc51f4d1b9802a13aec39aaf3:trNone",
+        "53:LATE_INIT:f26:gt4a8058d0441a46d381995e1af1086039:trNone",
+        "55:LATE_INIT:f26:gte561b60694dc4514b6dddcfc5a5b6a90:trNone",
+        "58:LATE_INIT:f28:gta6ca1e8c4eee458cb4981e02f58c954f:tr149",
+        "59:LATE_INIT:f28:gtb9df4a8540da4a3a94d7911ead8c1bc8:trNone",
+        "63:LATE_INIT:f30:gt1377fe4255444b1495d0ccb972d8ef98:trNone",
+        "65:LATE_INIT:f30:gt6702a65bda8b4e2da8ac270c26e425bd:tr138",
+        "69:LATE_INIT:f32:gt19f5d51759454803ae8bbc45bfb92737:trNone",
+        "70:LATE_INIT:f32:gt7328a1bef88b4e84aa2ee0d837effd8d:trNone",
+        "81:LATE_INIT:f36:gt2cc84e32d40647b185276f8d7baf5322:trNone",
+        "82:LATE_INIT:f36:gt4bee849ae27b40a684321dbc6f780872:trNone",
+        "87:LATE_INIT:f37:gt723af3d23fb445e3ab97669e85846445:trNone",
+        "89:LATE_INIT:f37:gtb673cf89298845398bf0252c52e5affd:trNone",
+        "93:LATE_INIT:f39:gtafff27c4b3934c59837d2294137735d5:trNone"
+      ],
+      "event_indices": [
+        2,
+        8,
+        18,
+        20,
+        22,
+        24,
+        25,
+        26,
+        30,
+        35,
+        36,
+        47,
+        49,
+        53,
+        55,
+        58,
+        59,
+        63,
+        65,
+        69,
+        70,
+        81,
+        82,
+        87,
+        89,
+        93
+      ],
+      "label": "Late initializations (other)",
+      "size": 26,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 26
+        },
+        "mean_duration_frames": 9.653846153846153,
+        "mean_neighbor_count_5m": 0.5,
+        "mean_range_m": 22.178916147857137,
+        "mean_severity": 0.7807692307692311,
+        "n": 26,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "ghost_any",
+      "event_ids": [
+        "5:GHOST_TRACK:f7:gtNone:tr18",
+        "7:GHOST_TRACK:f8:gtNone:tr24",
+        "11:GHOST_TRACK:f14:gtNone:tr7",
+        "12:GHOST_TRACK:f14:gtNone:tr97",
+        "17:GHOST_TRACK:f15:gtNone:tr108",
+        "23:GHOST_TRACK:f16:gtNone:tr118",
+        "27:GHOST_TRACK:f18:gtNone:tr132",
+        "28:GHOST_TRACK:f18:gtNone:tr135",
+        "38:GHOST_TRACK:f20:gtNone:tr138",
+        "39:GHOST_TRACK:f20:gtNone:tr139",
+        "40:GHOST_TRACK:f20:gtNone:tr140",
+        "41:GHOST_TRACK:f21:gtNone:tr144",
+        "45:GHOST_TRACK:f23:gtNone:tr146",
+        "61:GHOST_TRACK:f29:gtNone:tr129",
+        "67:GHOST_TRACK:f31:gtNone:tr184",
+        "72:GHOST_TRACK:f34:gtNone:tr143",
+        "80:GHOST_TRACK:f36:gtNone:tr156",
+        "86:GHOST_TRACK:f37:gtNone:tr138"
+      ],
+      "event_indices": [
+        5,
+        7,
+        11,
+        12,
+        17,
+        23,
+        27,
+        28,
+        38,
+        39,
+        40,
+        41,
+        45,
+        61,
+        67,
+        72,
+        80,
+        86
+      ],
+      "label": "Ghost tracks (unmatched confirmed/coasting)",
+      "size": 18,
+      "summary": {
+        "cls_mode": "pedestrian",
+        "kind_mode": "GHOST_TRACK",
+        "kinds": {
+          "GHOST_TRACK": 18
+        },
+        "mean_duration_frames": 3.0,
+        "mean_neighbor_count_5m": 0.7777777777777778,
+        "mean_range_m": 22.59297001098379,
+        "mean_severity": 0.29999999999999993,
+        "n": 18,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "pos_spike",
+      "event_ids": [
+        "6:POS_ERROR_SPIKE:f7:gt200c440c0e9b4627ad4f3047227016a2:tr2",
+        "16:POS_ERROR_SPIKE:f14:gt200c440c0e9b4627ad4f3047227016a2:tr2",
+        "48:POS_ERROR_SPIKE:f23:gt200c440c0e9b4627ad4f3047227016a2:tr2",
+        "51:POS_ERROR_SPIKE:f24:gt200c440c0e9b4627ad4f3047227016a2:tr2",
+        "52:POS_ERROR_SPIKE:f24:gteaaf60765ee8478f8e0bd4942571c6fb:tr141",
+        "56:POS_ERROR_SPIKE:f27:gt200c440c0e9b4627ad4f3047227016a2:tr2",
+        "60:POS_ERROR_SPIKE:f28:gt200c440c0e9b4627ad4f3047227016a2:tr2",
+        "66:POS_ERROR_SPIKE:f30:gtdce1fda2d70945c792dcc27074ec6aa9:tr128",
+        "68:POS_ERROR_SPIKE:f31:gtd0f5aace57684923b8a44b554b006fb2:tr120",
+        "73:POS_ERROR_SPIKE:f34:gtd0f5aace57684923b8a44b554b006fb2:tr120",
+        "77:POS_ERROR_SPIKE:f35:gtd0f5aace57684923b8a44b554b006fb2:tr120",
+        "78:POS_ERROR_SPIKE:f35:gtdce1fda2d70945c792dcc27074ec6aa9:tr128",
+        "83:POS_ERROR_SPIKE:f36:gt045cd82a77a1472499e8c15100cb5ff3:tr123",
+        "84:POS_ERROR_SPIKE:f36:gtd0f5aace57684923b8a44b554b006fb2:tr120",
+        "85:POS_ERROR_SPIKE:f36:gtdce1fda2d70945c792dcc27074ec6aa9:tr128",
+        "90:POS_ERROR_SPIKE:f37:gtd0f5aace57684923b8a44b554b006fb2:tr120",
+        "91:POS_ERROR_SPIKE:f38:gtd0f5aace57684923b8a44b554b006fb2:tr120"
+      ],
+      "event_indices": [
+        6,
+        16,
+        48,
+        51,
+        52,
+        56,
+        60,
+        66,
+        68,
+        73,
+        77,
+        78,
+        83,
+        84,
+        85,
+        90,
+        91
+      ],
+      "label": "Position error spikes",
+      "size": 17,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "POS_ERROR_SPIKE",
+        "kinds": {
+          "POS_ERROR_SPIKE": 17
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 41.324918659655836,
+        "mean_severity": 0.6443976403357027,
+        "n": 17,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "other_id_switch",
+      "event_ids": [
+        "74:ID_SWITCH:f35:gt96c353e8f14d4a63ba2b844d43cffc42:tr263",
+        "92:ID_SWITCH:f39:gt1f8d7e8410ed435da374688590a13b0a:tr263"
+      ],
+      "event_indices": [
+        74,
+        92
+      ],
+      "label": "Identity switches (other)",
+      "size": 2,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "ID_SWITCH",
+        "kinds": {
+          "ID_SWITCH": 2
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.5,
+        "mean_range_m": 15.473209923873393,
+        "mean_severity": 1.0,
+        "n": 2,
+        "range_bin_mode": "near"
+      }
+    },
+    {
+      "bucket": "other_track_drop",
+      "event_ids": [
+        "79:TRACK_DROP:f35:gt96c353e8f14d4a63ba2b844d43cffc42:tr263",
+        "95:TRACK_DROP:f39:gt1f8d7e8410ed435da374688590a13b0a:tr263"
+      ],
+      "event_indices": [
+        79,
+        95
+      ],
+      "label": "Track drops (other)",
+      "size": 2,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "TRACK_DROP",
+        "kinds": {
+          "TRACK_DROP": 2
+        },
+        "mean_duration_frames": 5.5,
+        "mean_neighbor_count_5m": 0.5,
+        "mean_range_m": 15.473209923873393,
+        "mean_severity": 0.55,
+        "n": 2,
+        "range_bin_mode": "near"
+      }
+    },
+    {
+      "bucket": "other_track_death",
+      "event_ids": [
+        "94:TRACK_DEATH:f39:gtdce1fda2d70945c792dcc27074ec6aa9:tr128"
+      ],
+      "event_indices": [
+        94
+      ],
+      "label": "Track deaths (other)",
+      "size": 1,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "TRACK_DEATH",
+        "kinds": {
+          "TRACK_DEATH": 1
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 48.56501081930791,
+        "mean_severity": 1.0,
+        "n": 1,
+        "range_bin_mode": "far"
+      }
+    }
+  ],
+  "fn": 826,
+  "fp": 233,
+  "frag": 2,
+  "ids": 2,
+  "metrics": {
+    "fn": 826,
+    "fp": 233,
+    "frag": 2,
+    "gt_count": 1065,
+    "ids": 2,
+    "mota": 0.003755868544600971,
+    "motp": 0.3818072531724482
+  },
+  "mota": 0.003755868544600971,
+  "motp": 0.3818072531724482,
+  "n_failures": 96,
+  "scene": "scene-0103"
+}
