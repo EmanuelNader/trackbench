@@ -49,6 +49,11 @@ struct Track {
   /// BEV box size from last associated detection (0 ⇒ class default in IoU).
   double l = 0.0;
   double w = 0.0;
+  /// Passive 3D metadata from the birth detection, constant for the track's
+  /// life (used by the AMOTA eval; never updated from later associations).
+  double z = 0.0;
+  double h = 0.0;
+  double score = 0.0;
   TrackState state = TrackState::TENTATIVE;
   int age = 0;
   double cov_trace = 0.0;
