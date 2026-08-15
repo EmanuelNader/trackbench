@@ -384,7 +384,11 @@ def main(argv: list[str] | None = None) -> int:
     if len(cells_by_label) != 24:
         raise SystemExit("error: expected 24 unique cells in the ablation grid")
     refs = load_references(manifest)
-    aliases = dict(manifest.get("meta", {}).get("aliases") or {})
+    meta_aliases = manifest.get("meta", {}).get("status", {}).get("aliases") or {}
+    ref_alias = manifest.get("reference", {}).get("alias") or {}
+    aliases = dict(meta_aliases)
+    if isinstance(ref_alias, dict):
+        aliases.update(ref_alias)
 
     selected = list(args.configs or [])
     resolved_refs = []
