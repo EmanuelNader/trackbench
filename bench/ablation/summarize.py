@@ -34,7 +34,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = REPO_ROOT / "bench" / "ablation" / "manifest.toml"
 OUT_ROOT = REPO_ROOT / "bench" / "ablation" / "out"
-DEFAULT_REPORT = "bench/ablation/RESULTS.md"
+DEFAULT_REPORT = REPO_ROOT / "bench" / "ablation" / "RESULTS.md"
 MANIFEST_REL = DEFAULT_MANIFEST.relative_to(REPO_ROOT)
 OUT_REL = OUT_ROOT.relative_to(REPO_ROOT)
 KNOBS = ["gate_m", "vel_cost_weight", "iou_weight", "min_birth_score"]
