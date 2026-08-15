@@ -1,0 +1,498 @@
+{
+  "configs": {
+    "gate1p5-vel4p0-iou0p0-birth0p5": [
+      {
+        "amota": 0.22495774862388215,
+        "amotp": 1.5820396186561319,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 618,
+        "label": "gate1p5-vel4p0-iou0p0-birth0p5",
+        "mota": -0.3005770842634944,
+        "p99_ms": 0.203042,
+        "precision": "double",
+        "reference": "post001",
+        "scenes": {
+          "scene-0061": {
+            "ids": 0,
+            "mota": 0.07911392405063289
+          },
+          "scene-0103": {
+            "ids": 0,
+            "mota": -0.00375586854460086
+          },
+          "scene-0553": {
+            "ids": 0,
+            "mota": -0.0050890585241729624
+          },
+          "scene-0655": {
+            "ids": 326,
+            "mota": -0.14169821525148718
+          },
+          "scene-0757": {
+            "ids": 1,
+            "mota": 0.16187989556135773
+          },
+          "scene-0796": {
+            "ids": 0,
+            "mota": 0.1019230769230769
+          },
+          "scene-0916": {
+            "ids": 287,
+            "mota": -0.20433436532507732
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 3,
+            "mota": -0.05714285714285716
+          },
+          "scene-1100": {
+            "ids": 1,
+            "mota": -0.2797494780793319
+          }
+        }
+      },
+      {
+        "amota": 0.22495774862388215,
+        "amotp": 1.5820396467540039,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 618,
+        "label": "gate1p5-vel4p0-iou0p0-birth0p5",
+        "mota": -0.3005770842634944,
+        "p99_ms": 0.260583,
+        "precision": "float",
+        "reference": "post001",
+        "scenes": {
+          "scene-0061": {
+            "ids": 0,
+            "mota": 0.07911392405063289
+          },
+          "scene-0103": {
+            "ids": 0,
+            "mota": -0.00375586854460086
+          },
+          "scene-0553": {
+            "ids": 0,
+            "mota": -0.0050890585241729624
+          },
+          "scene-0655": {
+            "ids": 326,
+            "mota": -0.14169821525148718
+          },
+          "scene-0757": {
+            "ids": 1,
+            "mota": 0.16187989556135773
+          },
+          "scene-0796": {
+            "ids": 0,
+            "mota": 0.1019230769230769
+          },
+          "scene-0916": {
+            "ids": 287,
+            "mota": -0.20433436532507732
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 3,
+            "mota": -0.05714285714285716
+          },
+          "scene-1100": {
+            "ids": 1,
+            "mota": -0.2797494780793319
+          }
+        }
+      }
+    ],
+    "gate1p5-vel4p0-iou2p0-birth0p5": [
+      {
+        "amota": 0.2250643547918785,
+        "amotp": 1.582055772636987,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 619,
+        "label": "gate1p5-vel4p0-iou2p0-birth0p5",
+        "mota": -0.2817845267338769,
+        "p99_ms": 0.204458,
+        "precision": "double",
+        "reference": "post002",
+        "scenes": {
+          "scene-0061": {
+            "ids": 0,
+            "mota": 0.07911392405063289
+          },
+          "scene-0103": {
+            "ids": 0,
+            "mota": -0.00375586854460086
+          },
+          "scene-0553": {
+            "ids": 0,
+            "mota": -0.0050890585241729624
+          },
+          "scene-0655": {
+            "ids": 327,
+            "mota": -0.14007571660356954
+          },
+          "scene-0757": {
+            "ids": 1,
+            "mota": 0.16187989556135773
+          },
+          "scene-0796": {
+            "ids": 0,
+            "mota": 0.1019230769230769
+          },
+          "scene-0916": {
+            "ids": 287,
+            "mota": -0.19969040247678027
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 3,
+            "mota": -0.05714285714285716
+          },
+          "scene-1100": {
+            "ids": 1,
+            "mota": -0.2672233820459291
+          }
+        }
+      },
+      {
+        "amota": 0.2250643547918785,
+        "amotp": 1.5820558007095773,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 619,
+        "label": "gate1p5-vel4p0-iou2p0-birth0p5",
+        "mota": -0.2817845267338769,
+        "p99_ms": 0.200167,
+        "precision": "float",
+        "reference": "post002",
+        "scenes": {
+          "scene-0061": {
+            "ids": 0,
+            "mota": 0.07911392405063289
+          },
+          "scene-0103": {
+            "ids": 0,
+            "mota": -0.00375586854460086
+          },
+          "scene-0553": {
+            "ids": 0,
+            "mota": -0.0050890585241729624
+          },
+          "scene-0655": {
+            "ids": 327,
+            "mota": -0.14007571660356954
+          },
+          "scene-0757": {
+            "ids": 1,
+            "mota": 0.16187989556135773
+          },
+          "scene-0796": {
+            "ids": 0,
+            "mota": 0.1019230769230769
+          },
+          "scene-0916": {
+            "ids": 287,
+            "mota": -0.19969040247678027
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 3,
+            "mota": -0.05714285714285716
+          },
+          "scene-1100": {
+            "ids": 1,
+            "mota": -0.2672233820459291
+          }
+        }
+      }
+    ],
+    "gate1p5-vel4p0-iou2p0-birth0p7": [
+      {
+        "amota": 0.21965138469868464,
+        "amotp": 1.623278285861901,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 415,
+        "label": "gate1p5-vel4p0-iou2p0-birth0p7",
+        "mota": 0.6659557607400299,
+        "p99_ms": 0.120042,
+        "precision": "double",
+        "reference": "post003",
+        "scenes": {
+          "scene-0061": {
+            "ids": 0,
+            "mota": 0.12341772151898733
+          },
+          "scene-0103": {
+            "ids": 0,
+            "mota": 0.08356807511737085
+          },
+          "scene-0553": {
+            "ids": 0,
+            "mota": 0.17557251908396942
+          },
+          "scene-0655": {
+            "ids": 216,
+            "mota": -0.07950243374797195
+          },
+          "scene-0757": {
+            "ids": 1,
+            "mota": 0.13054830287206265
+          },
+          "scene-0796": {
+            "ids": 0,
+            "mota": 0.1019230769230769
+          },
+          "scene-0916": {
+            "ids": 197,
+            "mota": -0.12590299277605776
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 1,
+            "mota": 0.09323308270676689
+          },
+          "scene-1100": {
+            "ids": 0,
+            "mota": 0.1148225469728601
+          }
+        }
+      },
+      {
+        "amota": 0.21965138469868464,
+        "amotp": 1.6232783143382736,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 415,
+        "label": "gate1p5-vel4p0-iou2p0-birth0p7",
+        "mota": 0.6659557607400299,
+        "p99_ms": 0.118416,
+        "precision": "float",
+        "reference": "post003",
+        "scenes": {
+          "scene-0061": {
+            "ids": 0,
+            "mota": 0.12341772151898733
+          },
+          "scene-0103": {
+            "ids": 0,
+            "mota": 0.08356807511737085
+          },
+          "scene-0553": {
+            "ids": 0,
+            "mota": 0.17557251908396942
+          },
+          "scene-0655": {
+            "ids": 216,
+            "mota": -0.07950243374797195
+          },
+          "scene-0757": {
+            "ids": 1,
+            "mota": 0.13054830287206265
+          },
+          "scene-0796": {
+            "ids": 0,
+            "mota": 0.1019230769230769
+          },
+          "scene-0916": {
+            "ids": 197,
+            "mota": -0.12590299277605776
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 1,
+            "mota": 0.09323308270676689
+          },
+          "scene-1100": {
+            "ids": 0,
+            "mota": 0.1148225469728601
+          }
+        }
+      }
+    ],
+    "gate2p0-vel0p0-iou0p0-birth0p0": [
+      {
+        "amota": 0.17906189244536205,
+        "amotp": 1.6452368536744388,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 890,
+        "label": "gate2p0-vel0p0-iou0p0-birth0p0",
+        "mota": -1.35118448300017,
+        "p99_ms": 0.510292,
+        "precision": "double",
+        "reference": "baseline",
+        "scenes": {
+          "scene-0061": {
+            "ids": 8,
+            "mota": -0.143987341772152
+          },
+          "scene-0103": {
+            "ids": 4,
+            "mota": -0.11455399061032856
+          },
+          "scene-0553": {
+            "ids": 2,
+            "mota": -0.08269720101781175
+          },
+          "scene-0655": {
+            "ids": 471,
+            "mota": -0.2049756625202812
+          },
+          "scene-0757": {
+            "ids": 2,
+            "mota": 0.16710182767624016
+          },
+          "scene-0796": {
+            "ids": 1,
+            "mota": 0.1480769230769231
+          },
+          "scene-0916": {
+            "ids": 384,
+            "mota": -0.2905056759545923
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 17,
+            "mota": -0.41654135338345855
+          },
+          "scene-1100": {
+            "ids": 1,
+            "mota": -0.4613778705636744
+          }
+        }
+      },
+      {
+        "amota": 0.17906189244536205,
+        "amotp": 1.6452368764196286,
+        "determinism": {
+          "pass": true,
+          "scene_bytes_compared": 10
+        },
+        "ids": 890,
+        "label": "gate2p0-vel0p0-iou0p0-birth0p0",
+        "mota": -1.35118448300017,
+        "p99_ms": 0.50575,
+        "precision": "float",
+        "reference": "baseline",
+        "scenes": {
+          "scene-0061": {
+            "ids": 8,
+            "mota": -0.143987341772152
+          },
+          "scene-0103": {
+            "ids": 4,
+            "mota": -0.11455399061032856
+          },
+          "scene-0553": {
+            "ids": 2,
+            "mota": -0.08269720101781175
+          },
+          "scene-0655": {
+            "ids": 471,
+            "mota": -0.2049756625202812
+          },
+          "scene-0757": {
+            "ids": 2,
+            "mota": 0.16710182767624016
+          },
+          "scene-0796": {
+            "ids": 1,
+            "mota": 0.1480769230769231
+          },
+          "scene-0916": {
+            "ids": 384,
+            "mota": -0.2905056759545923
+          },
+          "scene-1077": {
+            "ids": 0,
+            "mota": 0.0482758620689655
+          },
+          "scene-1094": {
+            "ids": 17,
+            "mota": -0.41654135338345855
+          },
+          "scene-1100": {
+            "ids": 1,
+            "mota": -0.4613778705636744
+          }
+        }
+      }
+    ]
+  },
+  "deltas": {
+    "gate1p5-vel4p0-iou0p0-birth0p5": {
+      "amota": 0.0,
+      "amotp": 2.8097872029064774e-08,
+      "ids": 0,
+      "mota": 0.0,
+      "p99_ms": 0.05754100000000001
+    },
+    "gate1p5-vel4p0-iou2p0-birth0p5": {
+      "amota": 0.0,
+      "amotp": 2.8072590252392615e-08,
+      "ids": 0,
+      "mota": 0.0,
+      "p99_ms": -0.004290999999999989
+    },
+    "gate1p5-vel4p0-iou2p0-birth0p7": {
+      "amota": 0.0,
+      "amotp": 2.8476372593289057e-08,
+      "ids": 0,
+      "mota": 0.0,
+      "p99_ms": -0.0016260000000000024
+    },
+    "gate2p0-vel0p0-iou0p0-birth0p0": {
+      "amota": 0.0,
+      "amotp": 2.2745189731665505e-08,
+      "ids": 0,
+      "mota": 0.0,
+      "p99_ms": -0.004541999999999935
+    }
+  },
+  "provenance": {
+    "bin_double": "core/build/trackbench_run",
+    "bin_float": "core/build-float/trackbench_run",
+    "commit": "93c1fe9c37389443df22bbbc06a5adc9b48e7381",
+    "python": "3.9.6",
+    "ts": "2026-08-15T07:38:32.406976+00:00"
+  },
+  "schema": "trackbench/precision-sweep/v1"
+}

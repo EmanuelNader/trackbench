@@ -44,8 +44,8 @@ void Ekf::predict(Track& track, double dt) const {
 }
 
 void Ekf::update(Track& track, const Detection& det) const {
-  Eigen::Matrix<double, kMeasDim, kStateDim> H =
-      Eigen::Matrix<double, kMeasDim, kStateDim>::Zero();
+  Eigen::Matrix<Real, kMeasDim, kStateDim> H =
+      Eigen::Matrix<Real, kMeasDim, kStateDim>::Zero();
   H(0, 0) = 1.0;
   H(1, 1) = 1.0;
   H(2, 4) = 1.0;
@@ -60,7 +60,7 @@ void Ekf::update(Track& track, const Detection& det) const {
   y(2) = normalize_angle(y(2));
 
   MeasMatrix S = H * track.P * H.transpose() + R_;
-  Eigen::Matrix<double, kStateDim, kMeasDim> K =
+  Eigen::Matrix<Real, kStateDim, kMeasDim> K =
       track.P * H.transpose() * S.inverse();
 
   x = x + K * y;
@@ -84,19 +84,19 @@ void Ekf::update(Track& track, const Detection& det) const {
   track.cov_trace = track.P.trace();
 }
 
-double Ekf::mahalanobis_pos_squared(const Track& track,
-                                    const Detection& det) const {
-  Eigen::Matrix<double, 2, kStateDim> H =
-      Eigen::Matrix<double, 2, kStateDim>::Zero();
+Real Ekf::mahalanobis_pos_squared(const Track& track,
+                                  const Detection& det) const {
+  Eigen::Matrix<Real, 2, kStateDim> H =
+      Eigen::Matrix<Real, 2, kStateDim>::Zero();
   H(0, 0) = 1.0;
   H(1, 1) = 1.0;
 
-  const Eigen::Vector2d innov(det.x - track.x, det.y - track.y);
-  Eigen::Matrix2d Rpos = Eigen::Matrix2d::Zero();
+  const Eigen::Matrix<Real, 2, 1> innov(det.x - track.x, det.y - track.y);
+  Eigen::Matrix<Real, 2, 2> Rpos = Eigen::Matrix<Real, 2, 2>::Zero();
   Rpos(0, 0) = config_.meas_var_pos;
   Rpos(1, 1) = config_.meas_var_pos;
-  const Eigen::Matrix2d S = H * track.P * H.transpose() + Rpos;
-  const Eigen::Vector2d sol = S.ldlt().solve(innov);
+  const Eigen::Matrix<Real, 2, 2> S = H * track.P * H.transpose() + Rpos;
+  const Eigen::Matrix<Real, 2, 1> sol = S.ldlt().solve(innov);
   return innov.dot(sol);
 }
 

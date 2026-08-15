@@ -9,6 +9,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(TRACKBENCH_BUILD_TESTS "Build GoogleTest unit tests" ON)
 option(TRACKBENCH_STAGE_TIMING "Enable per-stage timing instrumentation" OFF)
 
+# Scalar precision of the EKF state/covariance. 'double' (default) is the
+# baseline golden-precision build; 'float' compiles the filter in single
+# precision. Plumbed to the trackbench library as PUBLIC TRACKBENCH_REAL=<type>
+# (+ TRACKBENCH_PRECISION_FLOAT when float) so the test binary and
+# trackbench_run inherit it.
+set(TRACKBENCH_PRECISION "double" CACHE STRING "tracker scalar precision: double|float")
+if(NOT TRACKBENCH_PRECISION STREQUAL "double" AND NOT TRACKBENCH_PRECISION STREQUAL "float")
+  message(FATAL_ERROR "TRACKBENCH_PRECISION must be 'double' or 'float', got '${TRACKBENCH_PRECISION}'")
+endif()
+
 include(FetchContent)
 
 # Eigen3 (header-only). Prefer system package; else FetchContent headers only.
@@ -41,6 +51,10 @@ target_include_directories(trackbench
 )
 if(TRACKBENCH_STAGE_TIMING)
   target_compile_definitions(trackbench PUBLIC TRACKBENCH_STAGE_TIMING)
+endif()
+target_compile_definitions(trackbench PUBLIC TRACKBENCH_REAL=${TRACKBENCH_PRECISION})
+if(TRACKBENCH_PRECISION STREQUAL "float")
+  target_compile_definitions(trackbench PUBLIC TRACKBENCH_PRECISION_FLOAT)
 endif()
 target_link_libraries(trackbench
   PUBLIC
@@ -93,5 +107,12 @@ if(TRACKBENCH_BUILD_TESTS)
   if(TRACKBENCH_STAGE_TIMING)
     target_compile_definitions(trackbench_tests PRIVATE TRACKBENCH_STAGE_TIMING)
   endif()
-  add_test(NAME trackbench_unit COMMAND trackbench_tests)
+  # The double golden fixture is a byte-compare only meaningful at double
+  # precision; under float the synthetic bytes differ by design. Exclude just
+  # the byte-compare case for the float build (the determinism test stays).
+  if(TRACKBENCH_PRECISION STREQUAL "float")
+    add_test(NAME trackbench_unit COMMAND trackbench_tests --gtest_filter=-Golden.SyntheticScene001ByteIdentical)
+  else()
+    add_test(NAME trackbench_unit COMMAND trackbench_tests)
+  endif()
 endif()

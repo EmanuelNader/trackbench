@@ -18,7 +18,7 @@ class Ekf {
   void update(Track& track, const Detection& det) const;
 
   /// Squared Mahalanobis distance in position (x, y) only.
-  double mahalanobis_pos_squared(const Track& track, const Detection& det) const;
+  Real mahalanobis_pos_squared(const Track& track, const Detection& det) const;
 
   const TrackerConfig& config() const { return config_; }
 

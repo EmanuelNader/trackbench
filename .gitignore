@@ -6,6 +6,7 @@ data/*
 
 # Build artifacts
 core/build/
+**/build-*/
 **/build/
 cmake-build-*/
 *.o
