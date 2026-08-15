@@ -133,8 +133,12 @@ def compute_cell(out_root: Path, cell: dict, force: bool) -> bool:
         json.dumps(clean_nan(payload), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    try:
+        shown = amota_path.relative_to(REPO_ROOT)
+    except ValueError:
+        shown = amota_path
     print(
-        f"  wrote {amota_path.relative_to(REPO_ROOT)} "
+        f"  wrote {shown} "
         f"all.amota={result['all']['amota']:.6f}"
     )
     return True
@@ -197,12 +201,23 @@ def main(argv: list[str] | None = None) -> int:
     out_of_range = []
     for name, knobs in refs.items():
         label = cell_label(knobs)
+        if args.only and label not in args.only:
+            continue
+        path = out_root / label / "amota.json"
+        if not path.is_file():
+            print(f"  {name:<9} {label:<38} (amota.json missing — not computed)")
+            continue
         data = load_amota(out_root, label)
         amota = data["all"]["amota"]
-        flag = "" if amota is not None and 0.0 <= amota <= 1.0 else "  <-- OUT OF [0,1]"
+        amotp = data["all"]["amotp"]
+        flag = ""
         if amota is not None and not (0.0 <= amota <= 1.0):
             out_of_range.append(label)
-        print(f"  {name:<9} {label:<38} all.amota = {amota}{flag}")
+            flag = "  <-- AMOTA OUT OF [0,1]"
+        elif amotp is not None and not (0.0 <= amotp <= 2.0):
+            out_of_range.append(label)
+            flag = "  <-- AMOTP OUT OF [0,2]"
+        print(f"  {name:<9} {label:<38} all.amota = {amota} all.amotp = {amotp}{flag}")
     return 1 if out_of_range else 0
 
 
