@@ -145,3 +145,20 @@ From the interaction notes table, marginal vs in-stack: birth 0.7's marginal (�
 
 Qualitative context only — the tables above are the primary evidence. On the two densest scenes, the dominant failure buckets shrink between baseline and post003: scene-0655 other_id_switch 419 → 182, ghost_any 74 → 44, dense_id_switch 52 → 34; scene-0916 other_id_switch 293 → 146, ghost_any 146 → 64, dense_id_switch 91 → 51. ID switches of every flavor — other, dense, ghost — drop together, so the gate + birth-score stack removes switching events rather than merely reclassifying them.
 
+## AMOTA
+
+### What the metric says
+
+AMOTA is a recall-averaged metric (40 recall slots, unachieved slots worst-filled at 0.0), so it ranks the same 24 cells differently than MOTA/IDS. The IDS-cutting fixes are AMOTA-positive up to `min_birth_score=0.5` (baseline 0.1791 → post001 0.2250, +26%), the IoU knob is a null here too (post001 → post002 = 0.2250 → 0.2251, AMOTP 1.5820 → 1.5821), but the birth-0.7 raise that wins MOTA/IDS reverses under AMOTA: post003 cuts IDS 619 → 415 and MOTA to +0.6660, yet AMOTA drops 0.2251 → 0.2197 and AMOTP worsens to 1.6233. Birth 0.7 hides low-confidence-but-correct tracks, so the high-recall slots go unachieved. As measured on the 10-scene mini set; no significance claims. Full story in finding 004.
+
+### Reference cells (AMOTA/AMOTP from each cell's `amota.json`)
+
+| ref | cell | MOTA | IDS | AMOTA | AMOTP |
+|-----|------|------|-----|-------|-------|
+| baseline | gate2p0-vel0p0-iou0p0-birth0p0 | -1.3512 | 890 | 0.1791 | 1.6452 |
+| post001 | gate1p5-vel4p0-iou0p0-birth0p5 | -0.3006 | 618 | 0.2250 | 1.5820 |
+| post002 | gate1p5-vel4p0-iou2p0-birth0p5 | -0.2818 | 619 | 0.2251 | 1.5821 |
+| post003 | gate1p5-vel4p0-iou2p0-birth0p7 | 0.6660 | 415 | 0.2197 | 1.6233 |
+
+AMOTA-best cell overall: `gate2p0-vel0p0-iou2p0-birth0p7` = 0.2385 (baseline gate 2.0 + IoU + birth 0.7). See `bench/ablation/pareto.svg` / `bench/ablation/pareto.md` for the accuracy-vs-latency chart, and `docs/findings/004-amota-vs-mota-ranking.md` for the per-class breakdown and the metric-vs-metric ranking tension.
+
