@@ -87,7 +87,7 @@ each precision).
 1. **Innovation arithmetic runs in double.** The measurement is double
    (`Detection`, `types.hpp:29-39`) and the `Real` state promotes to double in
    the gate's innovation subtraction `det.x - track.x` before narrowing back
-   into the `Real` vector (`ekf.cpp:89`). The float result is therefore best
+   into the `Real` vector (`ekf.cpp:94`). The float result is therefore best
    read as *"float filter, double-precision innovation arithmetic"* — this sweep
    does not exercise a pure single-precision math path end to end.
 2. **`p99_ms` is wall-clock jitter, not a speed claim.** The run-to-run and
