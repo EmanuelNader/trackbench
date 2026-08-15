@@ -42,8 +42,8 @@ jobs:
         run: |
           cmake -S core -B core/build-float -DCMAKE_BUILD_TYPE=Release -DTRACKBENCH_BUILD_TESTS=ON -DTRACKBENCH_PRECISION=float
           cmake --build core/build-float -j$(nproc)
-      - name: Test (exclude double golden byte-compare)
-        run: cd core/build-float && ctest --output-on-failure -E golden
+      - name: Test (float; golden byte-compare excluded via CMake gtest filter)
+        run: cd core/build-float && ctest --output-on-failure
       - name: Determinism smoke (float)
         run: |
           ./core/build-float/trackbench_run \

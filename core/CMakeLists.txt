@@ -107,12 +107,11 @@ if(TRACKBENCH_BUILD_TESTS)
   if(TRACKBENCH_STAGE_TIMING)
     target_compile_definitions(trackbench_tests PRIVATE TRACKBENCH_STAGE_TIMING)
   endif()
-  # The double golden fixture is byte-compare only meaningful at double
-  # precision; under float the synthetic bytes differ by design. Exclude the
-  # Golden.* cases for the float build so `ctest -E golden` (single test
-  # binary) does not fail on the expected byte divergence.
+  # The double golden fixture is a byte-compare only meaningful at double
+  # precision; under float the synthetic bytes differ by design. Exclude just
+  # the byte-compare case for the float build (the determinism test stays).
   if(TRACKBENCH_PRECISION STREQUAL "float")
-    add_test(NAME trackbench_unit COMMAND trackbench_tests --gtest_filter=-Golden.*)
+    add_test(NAME trackbench_unit COMMAND trackbench_tests --gtest_filter=-Golden.SyntheticScene001ByteIdentical)
   else()
     add_test(NAME trackbench_unit COMMAND trackbench_tests)
   endif()
