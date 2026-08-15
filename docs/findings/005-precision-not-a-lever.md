@@ -107,7 +107,8 @@ platform.** float ≡ double on MOTA/IDS/AMOTA across all four reference configs
 AMOTP differs only in ~1e-8 summation noise, and both precisions are fully
 deterministic. Keep `double` as the default (free, zero risk, byte-identical to
 the committed Phase 4/5 outputs); the float build stays available as a
-CI-checked configuration (`ctest -E golden` + determinism smoke) for future
+CI-checked configuration (float ctest with the golden byte-compare excluded
+via the CMake gtest filter, plus the determinism smoke) for future
 targets. All figures are as measured on the 10-scene mini set; no significance
 claims.
 
