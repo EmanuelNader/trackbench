@@ -1,10 +1,11 @@
-.PHONY: help demo up down migrate core core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap eval-fixture demo-ui bench-latency
+.PHONY: help demo up down migrate core core-float core-test ingest-one eval-test api-install web-install lint demo-bundle demo-bootstrap eval-fixture demo-ui bench-latency
 
 help:
 	@echo "trackbench targets:"
 	@echo "  make up             - start Postgres (docker-compose)"
 	@echo "  make migrate        - apply Prisma schema"
-	@echo "  make core           - build C++ tracker (Release)"
+	@echo "  make core           - build C++ tracker (Release, double precision)"
+	@echo "  make core-float     - build C++ tracker (Release, float precision)"
 	@echo "  make core-test      - build + run GoogleTest"
 	@echo "  make ingest-one     - ingest first mini scene (requires data)"
 	@echo "  make eval-fixture   - CLEAR MOT + mine + gate on synthetic golden tracks"
@@ -50,6 +51,10 @@ NPROC := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 core:
 	cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Release
 	cmake --build core/build -j$(NPROC)
+
+core-float:
+	cmake -S core -B core/build-float -DCMAKE_BUILD_TYPE=Release -DTRACKBENCH_PRECISION=float
+	cmake --build core/build-float -j$(NPROC)
 
 core-test:
 	cmake -S core -B core/build -DCMAKE_BUILD_TYPE=Debug -DTRACKBENCH_BUILD_TESTS=ON

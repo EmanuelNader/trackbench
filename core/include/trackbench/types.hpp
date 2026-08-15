@@ -11,10 +11,19 @@ namespace trackbench {
 constexpr int kStateDim = 5;  // [x, y, vx, vy, yaw]
 constexpr int kMeasDim = 3;   // [x, y, yaw]
 
-using StateVector = Eigen::Matrix<double, kStateDim, 1>;
-using StateMatrix = Eigen::Matrix<double, kStateDim, kStateDim>;
-using MeasVector = Eigen::Matrix<double, kMeasDim, 1>;
-using MeasMatrix = Eigen::Matrix<double, kMeasDim, kMeasDim>;
+/// Scalar precision of the filter state/covariance. Defaults to double;
+/// override with -DTRACKBENCH_PRECISION=float (CMake) to compile the EKF in
+/// single precision. Detection, TrackerConfig, and Track metadata stay double
+/// (input/JSON contract); a float state converts to double losslessly on write.
+#ifndef TRACKBENCH_REAL
+#define TRACKBENCH_REAL double
+#endif
+using Real = TRACKBENCH_REAL;
+
+using StateVector = Eigen::Matrix<Real, kStateDim, 1>;
+using StateMatrix = Eigen::Matrix<Real, kStateDim, kStateDim>;
+using MeasVector = Eigen::Matrix<Real, kMeasDim, 1>;
+using MeasMatrix = Eigen::Matrix<Real, kMeasDim, kMeasDim>;
 
 /// Detection in ego frame at the current timestamp (JSONL detections.jsonl).
 struct Detection {
@@ -41,11 +50,11 @@ enum class TrackState {
 struct Track {
   int64_t id = 0;
   std::string cls;
-  double x = 0.0;
-  double y = 0.0;
-  double yaw = 0.0;
-  double vx = 0.0;
-  double vy = 0.0;
+  Real x = 0.0;
+  Real y = 0.0;
+  Real yaw = 0.0;
+  Real vx = 0.0;
+  Real vy = 0.0;
   /// BEV box size from last associated detection (0 ⇒ class default in IoU).
   double l = 0.0;
   double w = 0.0;
@@ -56,7 +65,7 @@ struct Track {
   double score = 0.0;
   TrackState state = TrackState::TENTATIVE;
   int age = 0;
-  double cov_trace = 0.0;
+  Real cov_trace = 0.0;
 
   /// EKF covariance for [x, y, vx, vy, yaw].
   StateMatrix P = StateMatrix::Identity();
