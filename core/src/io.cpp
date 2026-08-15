@@ -221,7 +221,12 @@ void write_tracks_jsonl(const std::string& path,
           << ",\"vy\":" << format_json_double(tr.vy)
           << ",\"state\":\"" << track_state_string(tr.state) << "\""
           << ",\"age\":" << tr.age
-          << ",\"cov_trace\":" << format_json_double(tr.cov_trace) << '}';
+          << ",\"cov_trace\":" << format_json_double(tr.cov_trace)
+          << ",\"z\":" << format_json_double(tr.z)
+          << ",\"l\":" << format_json_double(tr.l)
+          << ",\"w\":" << format_json_double(tr.w)
+          << ",\"h\":" << format_json_double(tr.h)
+          << ",\"score\":" << format_json_double(tr.score) << '}';
     }
     out << "]}\n";
   }
