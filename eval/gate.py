@@ -101,11 +101,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.timing and args.timing.is_file():
         timing = json.loads(args.timing.read_text(encoding="utf-8"))
-        # Accept either {"frames":[{"ms":...}]} or {"p99_ms":...}
+        # Producer contract (core/include/trackbench/io.hpp):
+        #   {"total_ms":..., "frames":N, "ms_per_frame":[...]}
+        # Also accept a precomputed {"p99_ms":...} from other tooling.
         if "p99_ms" in timing:
             current["latency_p99_ms"] = float(timing["p99_ms"])
-        elif "frames" in timing:
-            ms = sorted(float(f["ms"]) for f in timing["frames"] if "ms" in f)
+        elif "ms_per_frame" in timing:
+            ms = sorted(float(x) for x in timing["ms_per_frame"])
             if ms:
                 idx = min(len(ms) - 1, int(round(0.99 * (len(ms) - 1))))
                 current["latency_p99_ms"] = ms[idx]

@@ -1,0 +1,14 @@
+# requirements.lock — exact pins for the Phase 4 ablation eval stack.
+# Generated from the project venv; Python 3.9.6 (.venv/bin/python3 --version).
+#
+# The eval/sweep stack (eval/ + scripts/) imports only stdlib + numpy:
+#   eval/metrics.py, eval/failure_miner.py  -> numpy
+#   eval/cluster.py, eval/run_eval.py, scripts/* -> stdlib only
+# pyquaternion / scipy are ingest & devkit concerns (requirements-full.txt) and
+# are not imported by eval/ or scripts/; eval/db.py's psycopg is an optional
+# lazy import only used by --write-db, not by the sweep.
+# tomli -> TOML manifest parsing on Py<3.11 (bench/ablation/manifest.toml).
+#
+# Install:  python -m pip install -r requirements.lock
+numpy==1.26.4
+tomli==2.4.1

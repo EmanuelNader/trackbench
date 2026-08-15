@@ -1,0 +1,17 @@
+{
+  "coast_frames": 5,
+  "gate_m": 2.0,
+  "gate_mahalanobis": 9.21,
+  "iou_weight": 0.0,
+  "meas_var_pos": 0.5,
+  "meas_var_yaw": 0.1,
+  "min_birth_score": 0.0,
+  "process_var_pos": 1.0,
+  "process_var_vel": 1.0,
+  "process_var_yaw": 0.1,
+  "promote_hits": 3,
+  "seed": 0,
+  "vel_cost_weight": 0.0,
+  "vel_gate_lateral_m": 1.0,
+  "vel_gate_min_speed": 1.0
+}

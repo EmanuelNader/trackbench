@@ -1,0 +1,209 @@
+{
+  "clusters": [
+    {
+      "bucket": "other_late_init",
+      "event_ids": [
+        "3:LATE_INIT:f5:gte75bb479e10c426e9dcf5ff1afefa84d:tr21",
+        "6:LATE_INIT:f11:gt82d680066ddd465dbd3b22fd6a66ed70:trNone",
+        "7:LATE_INIT:f11:gtdbac6d80f3724778b2a1d39c591e93c7:trNone",
+        "9:LATE_INIT:f14:gtb327acc1048e44889108740b2304dabc:trNone",
+        "14:LATE_INIT:f18:gt9931995543b74a82ae95928ef340fef6:trNone",
+        "15:LATE_INIT:f20:gt58350757f1d04f628aab9b22cf33549b:trNone",
+        "17:LATE_INIT:f25:gt38798e421c51439f883ead7073ce7b79:trNone",
+        "19:LATE_INIT:f27:gt3ca372ae40fc4727a1e0e245122ccf94:trNone",
+        "20:LATE_INIT:f28:gt11ae216987c84c0abefef802331df41c:trNone",
+        "23:LATE_INIT:f31:gtc27a467cdb1c4643801745a2574d6a46:trNone",
+        "26:LATE_INIT:f36:gt2c74f27891164c9182d5a0d0102dca8c:trNone",
+        "27:LATE_INIT:f39:gteb28d3eeb8ac46b8ac47848a18d41dc5:trNone"
+      ],
+      "event_indices": [
+        3,
+        6,
+        7,
+        9,
+        14,
+        15,
+        17,
+        19,
+        20,
+        23,
+        26,
+        27
+      ],
+      "label": "Late initializations (other)",
+      "size": 12,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 12
+        },
+        "mean_duration_frames": 10.833333333333334,
+        "mean_neighbor_count_5m": 0.25,
+        "mean_range_m": 23.805993396083363,
+        "mean_severity": 0.8833333333333333,
+        "n": 12,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "late_init_far",
+      "event_ids": [
+        "0:LATE_INIT:f2:gtc02e9190395b41d6ae3db4e3d3c7ba4b:trNone",
+        "1:LATE_INIT:f2:gtfc42158d663f45358435cd3d80627640:trNone",
+        "2:LATE_INIT:f5:gt59064285ad664ee28b4bcb3d322334f9:trNone",
+        "10:LATE_INIT:f15:gt2a318666f9144553a5700cd042626988:tr89",
+        "11:LATE_INIT:f16:gtba9b515701e248b0a00c814447cea8a1:trNone",
+        "24:LATE_INIT:f31:gtfa6a5ac33235480f835203a30a9c2455:tr198",
+        "25:LATE_INIT:f35:gt415f26c98be6425aa9bf929e724e9b90:trNone"
+      ],
+      "event_indices": [
+        0,
+        1,
+        2,
+        10,
+        11,
+        24,
+        25
+      ],
+      "label": "Late track initialization at far range",
+      "size": 7,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 7
+        },
+        "mean_duration_frames": 20.0,
+        "mean_neighbor_count_5m": 0.2857142857142857,
+        "mean_range_m": 35.179307578742254,
+        "mean_severity": 0.9714285714285714,
+        "n": 7,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "ghost_any",
+      "event_ids": [
+        "13:GHOST_TRACK:f18:gtNone:tr99",
+        "16:GHOST_TRACK:f23:gtNone:tr132",
+        "18:GHOST_TRACK:f26:gtNone:tr154"
+      ],
+      "event_indices": [
+        13,
+        16,
+        18
+      ],
+      "label": "Ghost tracks (unmatched confirmed/coasting)",
+      "size": 3,
+      "summary": {
+        "cls_mode": "pedestrian",
+        "kind_mode": "GHOST_TRACK",
+        "kinds": {
+          "GHOST_TRACK": 3
+        },
+        "mean_duration_frames": 3.0,
+        "mean_neighbor_count_5m": 0.6666666666666666,
+        "mean_range_m": 21.313039497809772,
+        "mean_severity": 0.3,
+        "n": 3,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "pos_spike",
+      "event_ids": [
+        "4:POS_ERROR_SPIKE:f10:gt0c3833f73f0e43288758cb87c9d2a4fe:tr1",
+        "8:POS_ERROR_SPIKE:f11:gt0c3833f73f0e43288758cb87c9d2a4fe:tr1",
+        "12:POS_ERROR_SPIKE:f16:gt0c3833f73f0e43288758cb87c9d2a4fe:tr1"
+      ],
+      "event_indices": [
+        4,
+        8,
+        12
+      ],
+      "label": "Position error spikes",
+      "size": 3,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "POS_ERROR_SPIKE",
+        "kinds": {
+          "POS_ERROR_SPIKE": 3
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 8.013427171679467,
+        "mean_severity": 0.8080224413678104,
+        "n": 3,
+        "range_bin_mode": "near"
+      }
+    },
+    {
+      "bucket": "other_track_drop",
+      "event_ids": [
+        "5:TRACK_DROP:f10:gte75bb479e10c426e9dcf5ff1afefa84d:tr21",
+        "22:TRACK_DROP:f29:gt2a318666f9144553a5700cd042626988:tr184"
+      ],
+      "event_indices": [
+        5,
+        22
+      ],
+      "label": "Track drops (other)",
+      "size": 2,
+      "summary": {
+        "cls_mode": "truck",
+        "kind_mode": "TRACK_DROP",
+        "kinds": {
+          "TRACK_DROP": 2
+        },
+        "mean_duration_frames": 3.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 28.601096624397528,
+        "mean_severity": 0.30000000000000004,
+        "n": 2,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "other_id_switch",
+      "event_ids": [
+        "21:ID_SWITCH:f29:gt2a318666f9144553a5700cd042626988:tr184"
+      ],
+      "event_indices": [
+        21
+      ],
+      "label": "Identity switches (other)",
+      "size": 1,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "ID_SWITCH",
+        "kinds": {
+          "ID_SWITCH": 1
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 35.07372250614059,
+        "mean_severity": 1.0,
+        "n": 1,
+        "range_bin_mode": "far"
+      }
+    }
+  ],
+  "fn": 279,
+  "fp": 41,
+  "frag": 3,
+  "ids": 1,
+  "metrics": {
+    "fn": 279,
+    "fp": 41,
+    "frag": 3,
+    "gt_count": 383,
+    "ids": 1,
+    "mota": 0.16187989556135773,
+    "motp": 0.431761488405676
+  },
+  "mota": 0.16187989556135773,
+  "motp": 0.431761488405676,
+  "n_failures": 28,
+  "scene": "scene-0757"
+}

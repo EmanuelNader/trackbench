@@ -1,0 +1,161 @@
+{
+  "clusters": [
+    {
+      "bucket": "late_init_far",
+      "event_ids": [
+        "0:LATE_INIT:f2:gt085fb7c411914888907f7198e998a951:trNone",
+        "1:LATE_INIT:f2:gt4080c30aa7104d91ad005a50b18f6108:trNone",
+        "2:LATE_INIT:f2:gt42641eb6adcb4f8f8def8ef129d9e843:trNone",
+        "3:LATE_INIT:f2:gt85246a44cc6340509e3882e2ff088391:trNone",
+        "4:LATE_INIT:f2:gta60047adc78a4b6895702e86b6d2fe88:trNone",
+        "5:LATE_INIT:f2:gtbd26c2cdb22d4bb1834e808c89128898:trNone",
+        "7:LATE_INIT:f2:gtf4b2632a2f9947da9f7959a3bd0e322c:trNone",
+        "8:LATE_INIT:f3:gt4005437c730645c2b628dc1da999e06a:trNone",
+        "9:LATE_INIT:f3:gt86ed8530809d4b1b8fbc53808f599339:trNone",
+        "10:LATE_INIT:f4:gta017fe4e9c3d445784aae034b1322006:trNone",
+        "12:LATE_INIT:f9:gt22907d343d2940e099a353e3b364b04e:trNone",
+        "13:LATE_INIT:f9:gtd7cd73e84d444b98a1923e1bcf433064:trNone",
+        "16:LATE_INIT:f24:gtf0056532879643c69e4efc9d845782f0:trNone",
+        "17:LATE_INIT:f25:gt12c1f51f9c284f3ea74dbdef151cf24b:trNone"
+      ],
+      "event_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        16,
+        17
+      ],
+      "label": "Late track initialization at far range",
+      "size": 14,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 14
+        },
+        "mean_duration_frames": 22.785714285714285,
+        "mean_neighbor_count_5m": 0.35714285714285715,
+        "mean_range_m": 55.32053123411423,
+        "mean_severity": 0.9142857142857144,
+        "n": 14,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "other_late_init",
+      "event_ids": [
+        "6:LATE_INIT:f2:gte91afa15647c4c4994f19aeb302c7179:trNone",
+        "11:LATE_INIT:f7:gtbc38961ca0ac4b14ab90e547ba79fbb6:tr21",
+        "14:LATE_INIT:f14:gtc1958768d48640948f6053d04cffd35b:tr41",
+        "18:LATE_INIT:f28:gtfdd3fe14d1c044b9a9f6c24383c6207c:tr109",
+        "19:LATE_INIT:f30:gt291e6cccbc254f2ab4eadfe98331dfec:tr119",
+        "20:LATE_INIT:f30:gt4b77b9d062f547a5a3cfe21ac661ea9a:tr120",
+        "21:LATE_INIT:f30:gt56a71c208ac6472f90b6a82529a6ce61:tr118",
+        "22:LATE_INIT:f30:gt61dd7d03d7ad466d89f901ed64e2c0dd:tr116",
+        "23:LATE_INIT:f32:gta0049f95375044b8987fbcca8fda1e2b:tr121"
+      ],
+      "event_indices": [
+        6,
+        11,
+        14,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "label": "Late initializations (other)",
+      "size": 9,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 9
+        },
+        "mean_duration_frames": 24.0,
+        "mean_neighbor_count_5m": 0.4444444444444444,
+        "mean_range_m": 15.4139766718309,
+        "mean_severity": 0.9666666666666666,
+        "n": 9,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "pos_spike",
+      "event_ids": [
+        "24:POS_ERROR_SPIKE:f37:gta0049f95375044b8987fbcca8fda1e2b:tr121",
+        "25:POS_ERROR_SPIKE:f38:gt56a71c208ac6472f90b6a82529a6ce61:tr118"
+      ],
+      "event_indices": [
+        24,
+        25
+      ],
+      "label": "Position error spikes",
+      "size": 2,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "POS_ERROR_SPIKE",
+        "kinds": {
+          "POS_ERROR_SPIKE": 2
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 1.0,
+        "mean_range_m": 27.686837828571843,
+        "mean_severity": 1.0,
+        "n": 2,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "ghost_any",
+      "event_ids": [
+        "15:GHOST_TRACK:f16:gtNone:tr21"
+      ],
+      "event_indices": [
+        15
+      ],
+      "label": "Ghost tracks (unmatched confirmed/coasting)",
+      "size": 1,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "GHOST_TRACK",
+        "kinds": {
+          "GHOST_TRACK": 1
+        },
+        "mean_duration_frames": 3.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 23.53149247656941,
+        "mean_severity": 0.3,
+        "n": 1,
+        "range_bin_mode": "mid"
+      }
+    }
+  ],
+  "fn": 548,
+  "fp": 6,
+  "frag": 0,
+  "ids": 0,
+  "metrics": {
+    "fn": 548,
+    "fp": 6,
+    "frag": 0,
+    "gt_count": 632,
+    "ids": 0,
+    "mota": 0.12341772151898733,
+    "motp": 0.1760469098746278
+  },
+  "mota": 0.12341772151898733,
+  "motp": 0.1760469098746278,
+  "n_failures": 26,
+  "scene": "scene-0061"
+}

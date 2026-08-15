@@ -1,0 +1,207 @@
+{
+  "clusters": [
+    {
+      "bucket": "late_init_far",
+      "event_ids": [
+        "0:LATE_INIT:f2:gt078a2d6a465b4200a2aab9ff75558fad:trNone",
+        "2:LATE_INIT:f2:gt6a0d7a293cc34a84b9857a4fa38cd4a3:trNone",
+        "3:LATE_INIT:f2:gt7a8b24608009457b963da57aa18beb58:trNone",
+        "4:LATE_INIT:f2:gt888521a8b57f46258e81a89bf062278b:trNone",
+        "5:LATE_INIT:f2:gt9c81acda9a6d4d15bd4e4a315a669d71:trNone",
+        "6:LATE_INIT:f2:gt9e94bea2db384cf1ba7264e02920b1d8:trNone",
+        "7:LATE_INIT:f2:gtd9a4df9e92804a44a039eb21e0dc1349:trNone",
+        "8:LATE_INIT:f3:gtd02ce7e39f534cb8b67ef101e32dbba7:tr13",
+        "9:LATE_INIT:f3:gte8ee78065abc41ac9dcae839a29eac0b:trNone",
+        "18:LATE_INIT:f9:gt7c6e078abfa74db5a5439711383a8f5b:trNone",
+        "21:LATE_INIT:f10:gtbdb82f4d50ce47e6b3925471c049355e:trNone",
+        "22:LATE_INIT:f10:gtf442a98a9a354484aef5240bb21e7691:trNone",
+        "26:LATE_INIT:f12:gt9cbb3b5b8bf849599abcb0228eea3edd:trNone",
+        "27:LATE_INIT:f12:gtb2a522c239af44e0927a51c941bd256e:trNone",
+        "28:LATE_INIT:f12:gtfb0b1fa4a33a43ea9cc802ba14a40586:tr77",
+        "31:LATE_INIT:f16:gt13d6281dd1be482a95e7ef4148fd0611:trNone",
+        "32:LATE_INIT:f17:gtd2583621ada8434c9b7265403b95054f:trNone",
+        "35:LATE_INIT:f23:gt813f2ab6ce964dce81bf47aadc0c854f:trNone"
+      ],
+      "event_indices": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        18,
+        21,
+        22,
+        26,
+        27,
+        28,
+        31,
+        32,
+        35
+      ],
+      "label": "Late track initialization at far range",
+      "size": 18,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 18
+        },
+        "mean_duration_frames": 24.944444444444443,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 60.33411260262265,
+        "mean_severity": 0.9611111111111111,
+        "n": 18,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "ghost_any",
+      "event_ids": [
+        "10:GHOST_TRACK:f4:gtNone:tr9",
+        "12:GHOST_TRACK:f5:gtNone:tr16",
+        "13:GHOST_TRACK:f5:gtNone:tr17",
+        "14:GHOST_TRACK:f6:gtNone:tr13",
+        "15:GHOST_TRACK:f6:gtNone:tr26",
+        "16:GHOST_TRACK:f8:gtNone:tr42",
+        "19:GHOST_TRACK:f10:gtNone:tr53",
+        "20:GHOST_TRACK:f10:gtNone:tr54",
+        "24:GHOST_TRACK:f11:gtNone:tr60",
+        "34:GHOST_TRACK:f21:gtNone:tr23"
+      ],
+      "event_indices": [
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        19,
+        20,
+        24,
+        34
+      ],
+      "label": "Ghost tracks (unmatched confirmed/coasting)",
+      "size": 10,
+      "summary": {
+        "cls_mode": "pedestrian",
+        "kind_mode": "GHOST_TRACK",
+        "kinds": {
+          "GHOST_TRACK": 10
+        },
+        "mean_duration_frames": 3.0,
+        "mean_neighbor_count_5m": 2.2,
+        "mean_range_m": 24.200223274555512,
+        "mean_severity": 0.29999999999999993,
+        "n": 10,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "pos_spike",
+      "event_ids": [
+        "23:POS_ERROR_SPIKE:f10:gte2afd7eaa5c04cff9e59ca025e14249c:tr8",
+        "25:POS_ERROR_SPIKE:f11:gte2afd7eaa5c04cff9e59ca025e14249c:tr8",
+        "29:POS_ERROR_SPIKE:f12:gte2afd7eaa5c04cff9e59ca025e14249c:tr8",
+        "30:POS_ERROR_SPIKE:f13:gte2afd7eaa5c04cff9e59ca025e14249c:tr8",
+        "37:POS_ERROR_SPIKE:f31:gt254ca291f1ee4223a0b1e392d4885fd2:tr5"
+      ],
+      "event_indices": [
+        23,
+        25,
+        29,
+        30,
+        37
+      ],
+      "label": "Position error spikes",
+      "size": 5,
+      "summary": {
+        "cls_mode": "bicycle",
+        "kind_mode": "POS_ERROR_SPIKE",
+        "kinds": {
+          "POS_ERROR_SPIKE": 5
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.2,
+        "mean_range_m": 24.456225739720146,
+        "mean_severity": 0.7315178018376436,
+        "n": 5,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "other_late_init",
+      "event_ids": [
+        "1:LATE_INIT:f2:gt2d7491faabc447769e1f2003f23c50e9:trNone",
+        "17:LATE_INIT:f8:gt2fb9e666a5d04e3f9888dad909324f75:trNone",
+        "36:LATE_INIT:f26:gt33d05c05532f40f692cf61f35c123df3:trNone"
+      ],
+      "event_indices": [
+        1,
+        17,
+        36
+      ],
+      "label": "Late initializations (other)",
+      "size": 3,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 3
+        },
+        "mean_duration_frames": 29.0,
+        "mean_neighbor_count_5m": 0.3333333333333333,
+        "mean_range_m": 20.09660071918813,
+        "mean_severity": 1.0,
+        "n": 3,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "other_id_switch",
+      "event_ids": [
+        "11:ID_SWITCH:f4:gtd02ce7e39f534cb8b67ef101e32dbba7:tr23",
+        "33:ID_SWITCH:f19:gtd02ce7e39f534cb8b67ef101e32dbba7:tr13"
+      ],
+      "event_indices": [
+        11,
+        33
+      ],
+      "label": "Identity switches (other)",
+      "size": 2,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "ID_SWITCH",
+        "kinds": {
+          "ID_SWITCH": 2
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 53.931802538668336,
+        "mean_severity": 1.0,
+        "n": 2,
+        "range_bin_mode": "far"
+      }
+    }
+  ],
+  "fn": 570,
+  "fp": 279,
+  "frag": 0,
+  "ids": 2,
+  "metrics": {
+    "fn": 570,
+    "fp": 279,
+    "frag": 0,
+    "gt_count": 786,
+    "ids": 2,
+    "mota": -0.08269720101781175,
+    "motp": 0.24693387175284892
+  },
+  "mota": -0.08269720101781175,
+  "motp": 0.24693387175284892,
+  "n_failures": 38,
+  "scene": "scene-0553"
+}

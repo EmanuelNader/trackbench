@@ -1,0 +1,143 @@
+{
+  "clusters": [
+    {
+      "bucket": "late_init_far",
+      "event_ids": [
+        "0:LATE_INIT:f2:gt078a2d6a465b4200a2aab9ff75558fad:trNone",
+        "2:LATE_INIT:f2:gt6a0d7a293cc34a84b9857a4fa38cd4a3:trNone",
+        "4:LATE_INIT:f2:gt7a8b24608009457b963da57aa18beb58:trNone",
+        "5:LATE_INIT:f2:gt888521a8b57f46258e81a89bf062278b:trNone",
+        "6:LATE_INIT:f2:gt9c81acda9a6d4d15bd4e4a315a669d71:trNone",
+        "7:LATE_INIT:f2:gt9e94bea2db384cf1ba7264e02920b1d8:trNone",
+        "8:LATE_INIT:f2:gtd02ce7e39f534cb8b67ef101e32dbba7:trNone",
+        "9:LATE_INIT:f2:gtd9a4df9e92804a44a039eb21e0dc1349:trNone",
+        "11:LATE_INIT:f3:gte8ee78065abc41ac9dcae839a29eac0b:trNone",
+        "13:LATE_INIT:f9:gt7c6e078abfa74db5a5439711383a8f5b:trNone",
+        "14:LATE_INIT:f10:gtbdb82f4d50ce47e6b3925471c049355e:trNone",
+        "15:LATE_INIT:f10:gtf442a98a9a354484aef5240bb21e7691:trNone",
+        "18:LATE_INIT:f12:gt9cbb3b5b8bf849599abcb0228eea3edd:trNone",
+        "19:LATE_INIT:f12:gtb2a522c239af44e0927a51c941bd256e:trNone",
+        "22:LATE_INIT:f16:gt13d6281dd1be482a95e7ef4148fd0611:trNone",
+        "23:LATE_INIT:f17:gtd2583621ada8434c9b7265403b95054f:trNone",
+        "24:LATE_INIT:f19:gtfb0b1fa4a33a43ea9cc802ba14a40586:tr27",
+        "25:LATE_INIT:f23:gt813f2ab6ce964dce81bf47aadc0c854f:trNone"
+      ],
+      "event_indices": [
+        0,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        14,
+        15,
+        18,
+        19,
+        22,
+        23,
+        24,
+        25
+      ],
+      "label": "Late track initialization at far range",
+      "size": 18,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 18
+        },
+        "mean_duration_frames": 26.944444444444443,
+        "mean_neighbor_count_5m": 0.0,
+        "mean_range_m": 60.335564149392695,
+        "mean_severity": 1.0,
+        "n": 18,
+        "range_bin_mode": "far"
+      }
+    },
+    {
+      "bucket": "other_late_init",
+      "event_ids": [
+        "1:LATE_INIT:f2:gt2d7491faabc447769e1f2003f23c50e9:trNone",
+        "3:LATE_INIT:f2:gt6ae762f1bc254d00bfb5ae9d66ffe376:trNone",
+        "10:LATE_INIT:f3:gte2afd7eaa5c04cff9e59ca025e14249c:tr4",
+        "12:LATE_INIT:f8:gt2fb9e666a5d04e3f9888dad909324f75:trNone",
+        "26:LATE_INIT:f26:gt33d05c05532f40f692cf61f35c123df3:trNone"
+      ],
+      "event_indices": [
+        1,
+        3,
+        10,
+        12,
+        26
+      ],
+      "label": "Late initializations (other)",
+      "size": 5,
+      "summary": {
+        "cls_mode": "car",
+        "kind_mode": "LATE_INIT",
+        "kinds": {
+          "LATE_INIT": 5
+        },
+        "mean_duration_frames": 26.2,
+        "mean_neighbor_count_5m": 0.4,
+        "mean_range_m": 17.118979988553306,
+        "mean_severity": 0.86,
+        "n": 5,
+        "range_bin_mode": "mid"
+      }
+    },
+    {
+      "bucket": "pos_spike",
+      "event_ids": [
+        "16:POS_ERROR_SPIKE:f10:gte2afd7eaa5c04cff9e59ca025e14249c:tr4",
+        "17:POS_ERROR_SPIKE:f11:gte2afd7eaa5c04cff9e59ca025e14249c:tr4",
+        "20:POS_ERROR_SPIKE:f12:gte2afd7eaa5c04cff9e59ca025e14249c:tr4",
+        "21:POS_ERROR_SPIKE:f13:gte2afd7eaa5c04cff9e59ca025e14249c:tr4",
+        "27:POS_ERROR_SPIKE:f31:gt254ca291f1ee4223a0b1e392d4885fd2:tr2"
+      ],
+      "event_indices": [
+        16,
+        17,
+        20,
+        21,
+        27
+      ],
+      "label": "Position error spikes",
+      "size": 5,
+      "summary": {
+        "cls_mode": "bicycle",
+        "kind_mode": "POS_ERROR_SPIKE",
+        "kinds": {
+          "POS_ERROR_SPIKE": 5
+        },
+        "mean_duration_frames": 1.0,
+        "mean_neighbor_count_5m": 0.2,
+        "mean_range_m": 24.456225739720146,
+        "mean_severity": 0.7548864995103785,
+        "n": 5,
+        "range_bin_mode": "mid"
+      }
+    }
+  ],
+  "fn": 636,
+  "fp": 2,
+  "frag": 0,
+  "ids": 0,
+  "metrics": {
+    "fn": 636,
+    "fp": 2,
+    "frag": 0,
+    "gt_count": 786,
+    "ids": 0,
+    "mota": 0.18829516539440205,
+    "motp": 0.2416403927307446
+  },
+  "mota": 0.18829516539440205,
+  "motp": 0.2416403927307446,
+  "n_failures": 28,
+  "scene": "scene-0553"
+}
