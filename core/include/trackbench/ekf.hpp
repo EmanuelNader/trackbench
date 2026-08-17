@@ -25,6 +25,7 @@ class Ekf {
  private:
   TrackerConfig config_;
   StateMatrix Q_base_ = StateMatrix::Zero();
+  StateMatrix Q_ctrv_ = StateMatrix::Zero();
   MeasMatrix R_ = MeasMatrix::Zero();
 };
 

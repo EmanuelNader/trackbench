@@ -63,6 +63,7 @@ struct Track {
   double z = 0.0;
   double h = 0.0;
   double score = 0.0;
+  double yaw_rate = 0.0;
   TrackState state = TrackState::TENTATIVE;
   int age = 0;
   Real cov_trace = 0.0;
@@ -115,6 +116,8 @@ struct TrackerConfig {
   double iou_weight = 2.0;
   /// Only birth new tracks from detections at/above this score.
   double min_birth_score = 0.7;
+  std::string motion_model = "cv";
+  double process_var_yawrate = 0.1;
 };
 
 inline const char* track_state_string(TrackState s) {
