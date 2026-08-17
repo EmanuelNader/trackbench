@@ -1,5 +1,9 @@
 # Phase 9 — Full nuScenes val split
 
+> STATUS: DONE — commit 712dead.
+> Result in `docs/findings/008` and `bench/val/`: orchestration script ready
+> (`scripts/eval_val.py`); awaits external data download (~850 GB v1.0-trainval).
+
 ## Why
 
 The current 10-scene mini set (v1.0-mini) is statistically limited — per-scene
