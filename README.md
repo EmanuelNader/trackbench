@@ -24,7 +24,7 @@ trackbench is an end-to-end loop that:
 | p99 latency (Hungarian) | 0.531 ms | 0.132 ms | 4× faster |
 | p99 latency (greedy) | — | **0.018 ms** | 29× faster |
 
-12 findings across 13 phases — 5 wins, 7 honest nulls. No inflated claims.
+13 phases, 12 findings — 5 wins, 7 honest nulls. No inflated claims. Every number traces to a committed output file.
 
 <p align="center">
   <img src="docs/assets/triage-bev.png" alt="trackbench bird's-eye triage UI on a dense scene with an ID switch selected" width="900" />
@@ -271,21 +271,21 @@ docs/assets/              README screenshot
 
 ## Milestones
 
-| Milestone | Status |
-|-----------|--------|
-| M0 Skeleton | done |
-| M1 Tracker v0 | done (golden byte-identical) |
-| M2 Metrics | done |
-| M3 Failure mining | done (rule clusters) |
-| M4 Triage UI | done (demo + real mini scenes) |
-| M5 CI gate | done (synthetic fixture floor) |
-| M6 Findings 001–003 | done — velocity gate win, IoU null, birth score win |
-| M7 AMOTA | done — nuScenes metric, 40-point recall curve |
-| M8 CTRRV | done — honest null, CV better everywhere |
-| M9 Greedy association | done — 7–19× faster, first Pareto point |
-| M10 Full val pipeline | done — `eval_val.py` ready, awaits data download |
-| M11 Pareto UI | done — interactive AMOTA-vs-latency scatter |
-| M12 Per-class + export | done — car tracker revealed, challenge CSV ready |
+| Phase | What | Status |
+|-------|------|--------|
+| 1 | Golden regression (byte-identical) | done |
+| 2 | Determinism (10/10 SHA-256 identical) | done |
+| 3 | eval-fixture CI gate | done |
+| 4 | 24-cell ablation grid (3,840 runs) | done |
+| 5 | AMOTA (nuScenes metric, 40-point recall) | done |
+| 6 | Precision sweep (double ≡ float — null) | done |
+| 7 | CTRRV motion model (null — CV better) | done |
+| 8 | Greedy association (7× faster, ΔAMOTA ±0.001) | done |
+| 9 | Full val pipeline (`eval_val.py` — awaits data) | done |
+| 10 | Pareto chart (interactive AMOTA-vs-latency) | done |
+| 11 | Hybrid association (= greedy on this data) | done |
+| 12 | Per-class breakdown (car tracker revealed) | done |
+| 13 | Challenge CSV export (production-ready output) | done |
 
 ## Constraints
 
