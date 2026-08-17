@@ -1,5 +1,11 @@
 # Phase 10 — Pareto chart in the triage UI
 
+> STATUS: DONE — commit 473d295.
+> Result in `docs/findings/009`: interactive Pareto chart (AMOTA-vs-latency
+> scatter) in the React triage UI. write_run.py persists AMOTA/p99_ms to
+> Postgres; new /api/runs/pareto endpoint; hand-rolled SVG scatter with
+> hover tooltips and metric selector.
+
 ## Why
 
 The AMOTA-vs-latency Pareto chart currently lives as a static SVG on disk
