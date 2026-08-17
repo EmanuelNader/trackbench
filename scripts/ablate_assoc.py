@@ -143,6 +143,13 @@ def run_one(
                 config_path.write_text(
                     json.dumps(cfg, indent=2, sort_keys=True) + "\n", encoding="utf-8"
                 )
+            elif assoc_mode == "hybrid":
+                cfg = copy.deepcopy(base_config)
+                cfg["assoc_mode"] = "hybrid"
+                config_path = run_dir / "config.json"
+                config_path.write_text(
+                    json.dumps(cfg, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+                )
             else:
                 config_path = ABLATION_OUT / label / "config.json"
             run_scene(binary, config_path, scene, tracks_out, timing_out)
@@ -357,7 +364,7 @@ def main(argv: list[str] | None = None) -> int:
     if not out_root.is_absolute():
         out_root = REPO_ROOT / out_root
 
-    assoc_modes = ["hungarian", "greedy"]
+    assoc_modes = ["hungarian", "greedy", "hybrid"]
     configs_results: dict[str, list] = {}
     cell_metrics: dict[tuple[str, str], dict] = {}
     failures: list[str] = []
