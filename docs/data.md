@@ -63,3 +63,48 @@ After ingest (+ `make core`):
 ```
 
 Synthetic smoke (no download): `make eval-fixture`.
+
+## Full nuScenes val split (~35 scenes)
+
+The mini set (10 scenes) is statistically limited. The full val split from
+nuScenes v1.0-trainval has ~35 scenes and dramatically increases statistical
+power for AMOTA recall curves and per-scene IDS analysis.
+
+### Download v1.0-trainval
+
+```bash
+# ~850 GB with full sensor data; ~700 MB for metadata-only
+# Requires nuScenes account: https://www.nuscenes.org/download
+wget -O data/raw/v1.0-trainval.tgz https://www.nuscenes.org/data/v1.0-trainval.tgz
+tar -xf data/raw/v1.0-trainval.tgz -C data/raw/nuscenes
+```
+
+Devkit expects `dataroot` containing `samples/`, `sweeps/`, `maps/`, and
+`v1.0-trainval/`.
+
+### Ingest val scenes
+
+The Megvii val detections (`megvii_val.json`, 214 MB) already cover the full
+val split — no merge needed:
+
+```bash
+python -m ingest.nuscenes_ingest \
+  --version v1.0-trainval \
+  --detections-json data/raw/detections/megvii_val.json
+```
+
+### Full-val evaluation pipeline
+
+Single command to ingest, track, and evaluate all val scenes:
+
+```bash
+python3 scripts/eval_val.py --config post003 --jobs 8
+# → bench/val/summary.json, bench/val/SUMMARY.md
+```
+
+Options:
+- `--limit N`: ingest + track only the first N scenes (for testing)
+- `--skip-ingest`: skip ingest (scenes already in data/normalized/)
+- `--eval-only`: skip ingest + track, only evaluate existing tracks
+- `--config NAME`: use any manifest reference (default: post003)
+- `--force`: re-run tracker even if tracks.jsonl exists
