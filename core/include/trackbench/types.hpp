@@ -117,6 +117,7 @@ struct TrackerConfig {
   /// Only birth new tracks from detections at/above this score.
   double min_birth_score = 0.7;
   std::string motion_model = "cv";
+  std::string assoc_mode = "hungarian";  // "hungarian" | "greedy"
   double process_var_yawrate = 0.1;
 };
 

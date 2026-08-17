@@ -275,6 +275,7 @@ TrackerConfig load_config(const std::string& path) {
   extract_number(body, "iou_weight", cfg.iou_weight);
   extract_number(body, "min_birth_score", cfg.min_birth_score);
   extract_string(body, "motion_model", cfg.motion_model);
+  extract_string(body, "assoc_mode", cfg.assoc_mode);
   extract_number(body, "process_var_yawrate", cfg.process_var_yawrate);
   return cfg;
 }

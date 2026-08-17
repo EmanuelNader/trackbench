@@ -340,6 +340,70 @@ double bev_oriented_iou_scratch(double x1, double y1, double l1, double w1,
   return iou;
 }
 
+/// Greedy minimization on `scratch.cost` (n_t × n_d). Produces an assignment
+/// (row → column) by sorting all finite-cost pairs and greedily assigning the
+/// cheapest available track–detection pair. Deterministic: ties broken by
+/// (row index, column index) to match Hungarian tie-breaking convention.
+/// On return `scratch.assignment` holds row → column (-1 when unassigned);
+/// Inf rejection happens in the caller using the untouched original
+/// `scratch.cost`.
+void greedy_solve(AssociateScratch& scratch) {
+  const auto& cost = scratch.cost;
+  const int n_rows = static_cast<int>(cost.size());
+  if (n_rows == 0) {
+    scratch.assignment.clear();
+    return;
+  }
+  const int n_cols = static_cast<int>(cost[0].size());
+
+  // Collect all finite-cost (i, j) pairs.
+  struct Pair {
+    int i;
+    int j;
+    double c;
+  };
+  std::vector<Pair> pairs;
+  pairs.reserve(static_cast<std::size_t>(n_rows) *
+                static_cast<std::size_t>(n_cols));
+  for (int i = 0; i < n_rows; ++i) {
+    for (int j = 0; j < n_cols; ++j) {
+      const double c = cost[static_cast<std::size_t>(i)]
+                           [static_cast<std::size_t>(j)];
+      if (c < kCostInf * 0.5) {
+        pairs.push_back({i, j, c});
+      }
+    }
+  }
+
+  // Sort by cost ascending; ties by (i, j) ascending for determinism.
+  std::stable_sort(pairs.begin(), pairs.end(),
+                   [](const Pair& a, const Pair& b) {
+                     if (a.c != b.c) {
+                       return a.c < b.c;
+                     }
+                     if (a.i != b.i) {
+                       return a.i < b.i;
+                     }
+                     return a.j < b.j;
+                   });
+
+  // Greedy assignment: assign cheapest available pair where both row and
+  // column are still unassigned.
+  scratch.assignment.assign(static_cast<std::size_t>(n_rows), -1);
+  std::vector<char> row_used(static_cast<std::size_t>(n_rows), 0);
+  std::vector<char> col_used(static_cast<std::size_t>(n_cols), 0);
+
+  for (const Pair& p : pairs) {
+    if (row_used[static_cast<std::size_t>(p.i)] ||
+        col_used[static_cast<std::size_t>(p.j)]) {
+      continue;
+    }
+    scratch.assignment[static_cast<std::size_t>(p.i)] = p.j;
+    row_used[static_cast<std::size_t>(p.i)] = 1;
+    col_used[static_cast<std::size_t>(p.j)] = 1;
+  }
+}
+
 }  // namespace
 
 void resolve_box_size(const std::string& cls, double& l, double& w) {
@@ -379,6 +443,28 @@ std::vector<int> hungarian_minimize(
   AssociateScratch scratch;
   scratch.cost = cost;
   munkres_scratch(scratch);
+  auto& assignment = scratch.assignment;
+  for (std::size_t i = 0; i < assignment.size(); ++i) {
+    const int j = assignment[i];
+    if (j < 0) {
+      continue;
+    }
+    if (j >= static_cast<int>(cost[i].size()) ||
+        cost[i][static_cast<std::size_t>(j)] >= kCostInf * 0.5) {
+      assignment[i] = -1;
+    }
+  }
+  return std::move(assignment);
+}
+
+std::vector<int> greedy_minimize(
+    const std::vector<std::vector<double>>& cost) {
+  if (cost.empty()) {
+    return {};
+  }
+  AssociateScratch scratch;
+  scratch.cost = cost;
+  greedy_solve(scratch);
   auto& assignment = scratch.assignment;
   for (std::size_t i = 0; i < assignment.size(); ++i) {
     const int j = assignment[i];
@@ -523,7 +609,11 @@ void associate_to(const std::vector<Track>& tracks,
   {
     timing::ScopedTimer timer_solve(timings_ref,
                                     timing::StageTimings::ASSOCIATION_SOLVE);
-    munkres_scratch(scratch);
+    if (cfg.assoc_mode == "greedy") {
+      greedy_solve(scratch);
+    } else {
+      munkres_scratch(scratch);
+    }
   }
 
   // Reject Inf assignments against the untouched original cost matrix.

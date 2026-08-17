@@ -62,6 +62,13 @@ struct AssociateScratch {
 /// lower column index (callers should order rows by track id).
 std::vector<int> hungarian_minimize(const std::vector<std::vector<double>>& cost);
 
+/// Greedy minimization on a rectangular cost matrix.
+/// Sorts all finite-cost pairs by (cost, row, column) and greedily assigns
+/// the cheapest available pair. Returns column assignment for each row
+/// (-1 if unassigned / Inf cost). Deterministic and faster than Hungarian
+/// but not globally optimal.
+std::vector<int> greedy_minimize(const std::vector<std::vector<double>>& cost);
+
 /// BEV IoU of two oriented boxes (center x,y; length l; width w; yaw).
 /// Returns a value in [0, 1]. Degenerate (non-positive) sizes yield 0.
 double bev_oriented_iou(double x1, double y1, double l1, double w1, double yaw1,
