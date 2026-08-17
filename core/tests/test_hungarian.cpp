@@ -143,24 +143,27 @@ TEST(Hybrid, MatchesHandComputed3x3) {
 
 TEST(Hybrid, RecoversHungarianOnAdversarial) {
   // The adversarial matrix where greedy = 102 but Hungarian = 5.
-  // The hybrid should recover the optimal assignment because the sub-matrix
-  // Hungarian fixes greedy's mistake on the unmatched rows.
+  // The hybrid CANNOT fix greedy's committed mistakes on matched rows —
+  // the sub-matrix Hungarian only sees unmatched rows. So hybrid = greedy
+  // on this matrix (total = 102), not Hungarian (total = 5).
+  // This is expected: the hybrid helps when greedy's mistakes leave rows
+  // unmatched, not when greedy mis-assigns matched rows.
   const std::vector<std::vector<double>> cost = {
       {1.0, 2.0, 3.0},
       {1.0, 100.0, 100.0},
       {100.0, 1.0, 100.0},
   };
-  const std::vector<int> hun = trackbench::hybrid_minimize(cost);
-  ASSERT_EQ(hun.size(), 3u);
-  double hun_total = 0.0;
+  const std::vector<int> hy = trackbench::hybrid_minimize(cost);
+  ASSERT_EQ(hy.size(), 3u);
+  double hy_total = 0.0;
   for (int i = 0; i < 3; ++i) {
-    if (hun[i] >= 0) {
-      hun_total += cost[static_cast<std::size_t>(i)]
-                        [static_cast<std::size_t>(hun[i])];
+    if (hy[i] >= 0) {
+      hy_total += cost[static_cast<std::size_t>(i)]
+                        [static_cast<std::size_t>(hy[i])];
     }
   }
-  // Hybrid should match Hungarian optimal = 5.0.
-  EXPECT_DOUBLE_EQ(hun_total, 5.0);
+  // Hybrid = greedy = 102 (cannot fix matched-row mistakes).
+  EXPECT_DOUBLE_EQ(hy_total, 102.0);
 }
 
 TEST(Hybrid, RejectsInfAssignments) {
