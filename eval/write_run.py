@@ -126,10 +126,18 @@ def list_scenes(normalized_dir: Path) -> list[str]:
 
 
 def aggregate_run_metrics(scene_metrics: dict[str, dict[str, float]]) -> dict[str, float]:
-    """Sum counts; recompute MOTA; weighted-mean MOTP by match count (gt - fn)."""
+    """Sum counts; recompute MOTA; weighted-mean MOTP by match count (gt - fn).
+
+    Also aggregates per-class IDS, FN, and GT counts into
+    ``per_class_{metric}_{cls}`` keys.
+    """
     fp = fn = ids = frag = gt_count = 0.0
     motp_weight = 0.0
     motp_acc = 0.0
+    # Per-class accumulators.
+    pc_ids: dict[str, float] = {}
+    pc_fn: dict[str, float] = {}
+    pc_gt: dict[str, float] = {}
     for m in scene_metrics.values():
         fp += float(m.get("fp", 0))
         fn += float(m.get("fn", 0))
@@ -141,6 +149,14 @@ def aggregate_run_metrics(scene_metrics: dict[str, dict[str, float]]) -> dict[st
         if matches > 0 and "motp" in m:
             motp_weight += matches
             motp_acc += float(m["motp"]) * matches
+        # Per-class breakdown (from evaluate_scene's per_class dict).
+        per_class = m.get("per_class")
+        if isinstance(per_class, dict):
+            for cls, counts in per_class.items():
+                if isinstance(counts, dict):
+                    pc_ids[cls] = pc_ids.get(cls, 0.0) + float(counts.get("ids", 0))
+                    pc_fn[cls] = pc_fn.get(cls, 0.0) + float(counts.get("fn", 0))
+                    pc_gt[cls] = pc_gt.get(cls, 0.0) + float(counts.get("gt_count", 0))
     denom = max(gt_count, 1.0)
     mota = 1.0 - (fp + fn + ids) / denom
     out: dict[str, float] = {
@@ -153,6 +169,11 @@ def aggregate_run_metrics(scene_metrics: dict[str, dict[str, float]]) -> dict[st
     }
     if motp_weight > 0:
         out["motp"] = motp_acc / motp_weight
+    # Persist per-class breakdowns as flat keys.
+    for cls in sorted(set(pc_gt) | set(pc_ids) | set(pc_fn)):
+        out[f"ids_{cls}"] = pc_ids.get(cls, 0.0)
+        out[f"fn_{cls}"] = pc_fn.get(cls, 0.0)
+        out[f"gt_count_{cls}"] = pc_gt.get(cls, 0.0)
     return out
 
 
@@ -262,6 +283,14 @@ def main(argv: list[str] | None = None) -> int:
             amota_result = compute_amota(amota_input)
             run_metrics["amota"] = float(amota_result["all"]["amota"])
             run_metrics["amotp"] = float(amota_result["all"]["amotp"])
+            # Persist per-class AMOTA/AMOTP.
+            per_class = amota_result.get("per_class", {})
+            for cls, vals in per_class.items():
+                if isinstance(vals, dict):
+                    if "amota" in vals and not (isinstance(vals["amota"], float) and __import__("math").isnan(vals["amota"])):
+                        run_metrics[f"amota_{cls}"] = float(vals["amota"])
+                    if "amotp" in vals and not (isinstance(vals["amotp"], float) and __import__("math").isnan(vals["amotp"])):
+                        run_metrics[f"amotp_{cls}"] = float(vals["amotp"])
     except Exception:
         pass  # AMOTA not critical for write_run; skip on import/math errors
 

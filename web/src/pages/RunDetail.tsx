@@ -71,6 +71,50 @@ export function RunDetail() {
         </div>
       </div>
 
+      {(() => {
+        const classes = ["car", "pedestrian", "bicycle", "truck", "bus", "trailer", "motorcycle"];
+        const hasPerClass = classes.some(
+          (c) => m[`ids_${c}`] != null || m[`amota_${c}`] != null,
+        );
+        if (!hasPerClass) return null;
+        return (
+          <section className="section">
+            <h2>Per-class breakdown</h2>
+            <div className="table-wrap">
+              <table className="data">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>GT</th>
+                    <th>IDS</th>
+                    <th>FN</th>
+                    <th>AMOTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {classes.map((c) => {
+                    const gt = m[`gt_count_${c}`];
+                    const ids = m[`ids_${c}`];
+                    const fn = m[`fn_${c}`];
+                    const amota = m[`amota_${c}`];
+                    if (gt == null && ids == null && amota == null) return null;
+                    return (
+                      <tr key={c}>
+                        <td>{c}</td>
+                        <td className="mono">{gt != null ? Math.round(Number(gt)) : "—"}</td>
+                        <td className="mono">{ids != null ? Math.round(Number(ids)) : "—"}</td>
+                        <td className="mono">{fn != null ? Math.round(Number(fn)) : "—"}</td>
+                        <td className="mono">{fmt(amota, 4)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })()}
+
       <section className="section">
         <h2>Scenes</h2>
         <div className="table-wrap">

@@ -48,6 +48,8 @@ class MotMetrics:
     fp: int
     fn: int
     gt_count: int  # total GT boxes across frames
+    # Per-class breakdowns (populated when compute_per_class=True).
+    per_class: dict[str, dict[str, int | float]] | None = None
 
     def to_dict(self) -> dict[str, float | int]:
         return asdict(self)
@@ -243,7 +245,13 @@ def evaluate_scene(
     track_frames: Sequence[Mapping[str, Any]],
     dist_threshold: float = 2.0,
 ) -> tuple[MotMetrics, list[FrameMatch]]:
-    """Compute CLEAR MOT metrics and per-frame match records for one scene."""
+    """Compute CLEAR MOT metrics and per-frame match records for one scene.
+
+    Per-class breakdowns (``ids``, ``fn``, ``gt_count`` per class) are
+    populated in ``MotMetrics.per_class`` when the GT rows carry a ``cls``
+    field. FP is left aggregate-only because unmatched tracks have no
+    unambiguous class assignment.
+    """
     gt_by_frame = _index_by_frame(gt_frames)
     tr_by_frame = _index_by_frame(track_frames)
     frame_ids = sorted(set(gt_by_frame) | set(tr_by_frame))
@@ -256,8 +264,17 @@ def evaluate_scene(
     motp_sum = 0.0
     motp_n = 0
 
+    # Per-class counters (keyed by GT box cls).
+    pc_ids: dict[str, int] = {}
+    pc_fn: dict[str, int] = {}
+    pc_gt: dict[str, int] = {}
+    pc_frag: dict[str, int] = {}
+
     # Previous matched track id for each GT (only updated when GT is matched).
     prev_match: dict[str, int] = {}
+    # Class of each GT id (persisted across frames so unmatched/occluded ids
+    # still resolve to their class).
+    gt_cls: dict[str, str] = {}
     # Fragmentation bookkeeping (see module docstring).
     ever_matched: set[str] = set()
     unmatched_since_match: set[str] = set()
@@ -272,21 +289,32 @@ def evaluate_scene(
         t = float(gt_row["t"] if gt_row is not None else tr_row["t"])  # type: ignore[index]
 
         gt_count += len(gt_boxes)
+        for g in gt_boxes:
+            cls = str(g.get("cls", "unknown"))
+            gt_cls[str(g["id"])] = cls
+            pc_gt[cls] = pc_gt.get(cls, 0) + 1
+
         matches, unmatched_gt, unmatched_tracks = _match_frame(
             gt_boxes, tracks, dist_threshold
         )
 
         total_fp += len(unmatched_tracks)
         total_fn += len(unmatched_gt)
+        for gid in unmatched_gt:
+            cls = gt_cls.get(str(gid), "unknown")
+            pc_fn[cls] = pc_fn.get(cls, 0) + 1
 
         matched_now = {gid: tid for gid, tid, _d in matches}
         for gid, tid, d in matches:
             motp_sum += d
             motp_n += 1
+            cls = gt_cls.get(str(gid), "unknown")
             if gid in prev_match and prev_match[gid] != tid:
                 total_ids += 1
+                pc_ids[cls] = pc_ids.get(cls, 0) + 1
             if gid in unmatched_since_match and gid in ever_matched:
                 total_frag += 1
+                pc_frag[cls] = pc_frag.get(cls, 0) + 1
                 unmatched_since_match.discard(gid)
             ever_matched.add(gid)
             prev_match[gid] = tid
@@ -308,6 +336,15 @@ def evaluate_scene(
     mota = 1.0 - (total_fn + total_fp + total_ids) / max(gt_count, 1)
     motp = (motp_sum / motp_n) if motp_n else 0.0
 
+    per_class: dict[str, dict[str, int | float]] = {}
+    for cls in sorted(set(pc_gt) | set(pc_ids) | set(pc_fn) | set(pc_frag)):
+        per_class[cls] = {
+            "gt_count": pc_gt.get(cls, 0),
+            "ids": pc_ids.get(cls, 0),
+            "fn": pc_fn.get(cls, 0),
+            "frag": pc_frag.get(cls, 0),
+        }
+
     metrics = MotMetrics(
         mota=float(mota),
         motp=float(motp),
@@ -316,6 +353,7 @@ def evaluate_scene(
         fp=int(total_fp),
         fn=int(total_fn),
         gt_count=int(gt_count),
+        per_class=per_class,
     )
     return metrics, frame_matches
 
