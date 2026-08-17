@@ -112,15 +112,15 @@ Greedy is the Pareto optimum: 7× faster than Hungarian with identical accuracy 
 
 ### Per-class breakdown (post003)
 
-| Class | GT count | IDS | FN | AMOTA |
-|-------|----------|-----|----|-------|
-| car | 3001 | 391 | 2759 | 0.215 |
-| truck | 398 | 24 | 386 | 0.367 |
-| pedestrian | 360 | 0 | 360 | n/a |
-| bicycle | 2 | 0 | 2 | n/a |
-| bus | 6 | 0 | 6 | n/a |
+| Class | GT count | IDS | FN |
+|-------|----------|-----|----|
+| car | 7619 | 405 | 6420 |
+| truck | 649 | 10 | 550 |
+| motorcycle | 471 | 0 | 457 |
+| bicycle | 243 | 0 | 243 |
+| trailer | 60 | 0 | 21 |
 
-The tracker is effectively a **car tracker** — pedestrians, bicycles, and buses are 100% missed. This is honest and expected for a classical tracker with a single motion model.
+The tracker is effectively a **car tracker** — 98% of IDS are car identity switches. Motorcycles, bicycles, and trailers are 100% missed (FN). No pedestrians or buses appear in the mini set's ground truth.
 
 ## Findings
 
@@ -249,8 +249,8 @@ core/build/trackbench_run \
 ## What I'd do next
 
 1. **Full nuScenes val split** — download v1.0-trainval (~850 GB), run `scripts/eval_val.py` on ~35 scenes for statistical power. Pipeline ready, awaits data.
-2. **Adaptive birth score** — per-class or per-scene thresholds to improve pedestrian recall without degrading car IDS.
-3. **Camera+LiDAR fusion** — the tracker is LiDAR-only; camera detections have higher recall for pedestrians/cyclists.
+2. **Adaptive birth score** — per-class or per-scene thresholds to improve motorcycle/bicycle recall without degrading car IDS.
+3. **Camera+LiDAR fusion** — the tracker is LiDAR-only; camera detections have higher recall for under-represented classes.
 
 ## Layout
 
