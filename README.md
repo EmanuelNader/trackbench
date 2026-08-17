@@ -157,6 +157,12 @@ flowchart LR
   core --> export[challenge CSV]
 ```
 
+<p align="center">
+  <img src="bench/ablation/pareto.svg" alt="AMOTA vs latency Pareto chart across 24-cell ablation grid" width="700" />
+</p>
+
+<p align="center"><em>AMOTA-vs-latency Pareto chart — each dot is one config from the 24-cell ablation grid. Hover for details in the triage UI.</em></p>
+
 Components: [docs/architecture.md](docs/architecture.md). Locked choices: [docs/decisions.md](docs/decisions.md).
 
 ## Quick start

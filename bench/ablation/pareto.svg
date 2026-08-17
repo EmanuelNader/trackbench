@@ -68,5 +68,5 @@
 <text x="475" y="498" font-size="13" text-anchor="middle" fill="#0f172a">p99 per-frame latency (ms)</text>
 <text x="28" y="270" font-size="13" text-anchor="middle" fill="#0f172a" transform="rotate(-90 28 270)">AMOTA (nuScenes)</text>
 <text x="90" y="510" font-size="11" fill="#64748b">data: bench/ablation/out/&lt;label&gt;/{summary,amota,scene-*_timing}.json (24 cells)</text>
-<text x="90" y="524" font-size="11" fill="#64748b">gen: python3 bench/pareto.py --metric amota | commit 57c6c0a00c55de71b73119e3b83d4449d47d911b | 2026-08-14</text>
+<text x="90" y="524" font-size="11" fill="#64748b">gen: python3 bench/pareto.py --metric amota | commit d4aaf5d1ec4a3bb40d5ac12aa0fe2bb40985b3bc | 2026-08-17</text>
 </svg>

@@ -43,6 +43,6 @@ Sorted by AMOTA descending; the `reference` column marks manifest reference cell
 
 - Data source: `bench/ablation/out/<label>/{summary,amota,scene-*_timing}.json`
 - Generation: `python3 bench/pareto.py`
-- Commit: `57c6c0a00c55de71b73119e3b83d4449d47d911b`
-- Date: 2026-08-14
+- Commit: `d4aaf5d1ec4a3bb40d5ac12aa0fe2bb40985b3bc`
+- Date: 2026-08-17
 
