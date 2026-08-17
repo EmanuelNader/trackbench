@@ -597,3 +597,78 @@ table.data tbody tr:hover {
     box-shadow: 0 0 0 3px rgba(61, 154, 106, 0.25);
   }
 }
+
+/* ---- Scatter / Pareto ---- */
+
+.scatter-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 660px;
+}
+
+.scatter-svg {
+  width: 100%;
+  height: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.scatter-svg .dot {
+  fill: var(--accent);
+  opacity: 0.85;
+  transition: r 80ms ease-out, opacity 80ms ease-out;
+  cursor: pointer;
+}
+
+.scatter-svg .dot-hover {
+  fill: var(--accent-bright, #5cc990);
+  opacity: 1;
+}
+
+.scatter-svg .tick-label {
+  fill: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.scatter-svg .axis-label {
+  fill: var(--text-muted);
+  font-size: 12px;
+}
+
+.scatter-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  z-index: 10;
+  color: var(--text);
+}
+
+.metric-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.empty code {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+}

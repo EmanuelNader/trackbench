@@ -111,6 +111,19 @@ export type BevBox = {
   visibility?: number;
 };
 
+export type ParetoPoint = {
+  id: string;
+  runKey: string;
+  commitSha: string;
+  notes: string | null;
+  mota: number | null;
+  ids: number | null;
+  amota: number | null;
+  amotp: number | null;
+  p99_ms: number | null;
+  motp: number | null;
+};
+
 export type FramePayload = {
   sceneId: string;
   frame: number;
@@ -163,4 +176,5 @@ export const api = {
       nFailures: number;
       nClusters: number;
     }>("/demo/bootstrap"),
+  getPareto: () => request<ParetoPoint[]>("/runs/pareto"),
 };

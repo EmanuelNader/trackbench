@@ -151,6 +151,32 @@ app.get("/runs/:id/diff/:baselineId", async (_req, res) => {
   res.json({});
 });
 
+/** Scatter-plot data for the Pareto chart (AMOTA vs latency). */
+app.get("/runs/pareto", async (_req, res) => {
+  const runs = await prisma.run.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { metrics: true },
+  });
+
+  res.json(
+    runs.map((run) => {
+      const m = metricsMap(run.metrics);
+      return {
+        id: run.id,
+        runKey: run.runKey,
+        commitSha: run.commitSha,
+        notes: run.notes,
+        mota: m.mota ?? null,
+        ids: m.ids ?? null,
+        amota: m.amota ?? null,
+        amotp: m.amotp ?? null,
+        p99_ms: m.p99_ms ?? null,
+        motp: m.motp ?? null,
+      };
+    }),
+  );
+});
+
 app.get("/runs/:id/clusters", async (req, res) => {
   const clusters = await prisma.cluster.findMany({
     where: { runId: req.params.id },

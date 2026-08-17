@@ -48,6 +48,9 @@ export function RunsList() {
       </p>
 
       <div className="toolbar">
+        <Link to="/pareto" className="btn ghost">
+          Pareto chart
+        </Link>
         <button
           className="btn primary"
           onClick={onBootstrap}

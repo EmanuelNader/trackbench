@@ -1,5 +1,6 @@
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { ClusterDetail } from "./pages/ClusterDetail";
+import { ParetoChart } from "./pages/ParetoChart";
 import { RunDetail } from "./pages/RunDetail";
 import { RunsList } from "./pages/RunsList";
 import { ScenePlayer } from "./pages/ScenePlayer";
@@ -26,6 +27,16 @@ function Crumbs() {
             <span className="mono">{sceneId}</span>
           </>
         ) : null}
+      </nav>
+    );
+  }
+
+  if (parts[0] === "pareto") {
+    return (
+      <nav className="nav-crumb">
+        <NavLink to="/">runs</NavLink>
+        <span className="sep">/</span>
+        <span>pareto</span>
       </nav>
     );
   }
@@ -66,6 +77,7 @@ export default function App() {
           <Route path="/" element={<RunsList />} />
           <Route path="/runs" element={<RunsList />} />
           <Route path="/runs/:runId" element={<RunDetail />} />
+          <Route path="/pareto" element={<ParetoChart />} />
           <Route path="/clusters/:clusterId" element={<ClusterDetail />} />
           <Route path="/player/:runId/:sceneId" element={<ScenePlayer />} />
         </Routes>

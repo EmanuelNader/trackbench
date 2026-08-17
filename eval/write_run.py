@@ -7,12 +7,17 @@ For each scene directory under ``normalized-dir``, loads GT from
 ``{normalized}/{scene}/gt.jsonl`` and tracks from ``{tracks-dir}/{scene}.jsonl``,
 runs CLEAR MOT (+ optional mining), aggregates metrics, clusters failures
 **globally**, and writes a single Postgres Run.
+
+Also computes AMOTA/AMOTP (via eval.amota) and pooled p99 latency (from
+timing.json files) and persists them as RunMetric entries so the Pareto chart
+in the web UI can read them through the API.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -30,6 +35,15 @@ from eval.run_eval import (
 
 DEFAULT_NORMALIZED = REPO_ROOT / "data" / "normalized"
 DEFAULT_TRACKS = REPO_ROOT / "data" / "tracks"
+
+
+def _nearest_rank_p99(values: list[float]) -> float | None:
+    """Nearest-rank p99 over sorted values, or None if empty."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    k = math.ceil(0.99 * len(ordered))
+    return ordered[k - 1]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -228,6 +242,47 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     run_metrics = aggregate_run_metrics(scene_metrics)
+
+    # Compute AMOTA/AMOTP across all scenes.
+    try:
+        from eval.amota import compute_amota
+        amota_input = []
+        for scene_id in scenes:
+            gt_path = normalized_dir / scene_id / "gt.jsonl"
+            tracks_path = tracks_dir / f"{scene_id}.jsonl"
+            if not tracks_path.is_file():
+                alt = normalized_dir / scene_id / "tracks.jsonl"
+                tracks_path = alt if alt.is_file() else tracks_path
+            if not gt_path.is_file() or not tracks_path.is_file():
+                continue
+            gt_frames = load_jsonl(gt_path)
+            track_frames = load_jsonl(tracks_path)
+            amota_input.append((gt_frames, track_frames))
+        if amota_input:
+            amota_result = compute_amota(amota_input)
+            run_metrics["amota"] = float(amota_result["all"]["amota"])
+            run_metrics["amotp"] = float(amota_result["all"]["amotp"])
+    except Exception:
+        pass  # AMOTA not critical for write_run; skip on import/math errors
+
+    # Compute pooled p99 latency from timing.json files.
+    ms_frames: list[float] = []
+    for scene_id in scenes:
+        for candidate in [
+            tracks_dir / f"{scene_id}_timing.json",
+            normalized_dir / scene_id / "timing.json",
+        ]:
+            if candidate.is_file():
+                try:
+                    timing = json.loads(candidate.read_text(encoding="utf-8"))
+                    ms_frames.extend(timing.get("ms_per_frame", []))
+                except Exception:
+                    pass
+                break
+    p99 = _nearest_rank_p99(ms_frames)
+    if p99 is not None:
+        run_metrics["p99_ms"] = p99
+
     commit_sha = resolve_commit_sha(args.commit_sha)
     config_json = load_config_json(args.config_json)
     config_for_key = {
