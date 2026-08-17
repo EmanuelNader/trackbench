@@ -125,3 +125,51 @@ TEST(Greedy, GreedyDiffersFromHungarianOnAdversarial) {
   }
   EXPECT_DOUBLE_EQ(gr_total, 102.0);
 }
+
+// ---- Hybrid solver tests ----
+
+TEST(Hybrid, MatchesHandComputed3x3) {
+  const std::vector<std::vector<double>> cost = {
+      {1.0, 2.0, 3.0},
+      {3.0, 1.0, 2.0},
+      {2.0, 3.0, 1.0},
+  };
+  const std::vector<int> assign = trackbench::hybrid_minimize(cost);
+  ASSERT_EQ(assign.size(), 3u);
+  EXPECT_EQ(assign[0], 0);
+  EXPECT_EQ(assign[1], 1);
+  EXPECT_EQ(assign[2], 2);
+}
+
+TEST(Hybrid, RecoversHungarianOnAdversarial) {
+  // The adversarial matrix where greedy = 102 but Hungarian = 5.
+  // The hybrid should recover the optimal assignment because the sub-matrix
+  // Hungarian fixes greedy's mistake on the unmatched rows.
+  const std::vector<std::vector<double>> cost = {
+      {1.0, 2.0, 3.0},
+      {1.0, 100.0, 100.0},
+      {100.0, 1.0, 100.0},
+  };
+  const std::vector<int> hun = trackbench::hybrid_minimize(cost);
+  ASSERT_EQ(hun.size(), 3u);
+  double hun_total = 0.0;
+  for (int i = 0; i < 3; ++i) {
+    if (hun[i] >= 0) {
+      hun_total += cost[static_cast<std::size_t>(i)]
+                        [static_cast<std::size_t>(hun[i])];
+    }
+  }
+  // Hybrid should match Hungarian optimal = 5.0.
+  EXPECT_DOUBLE_EQ(hun_total, 5.0);
+}
+
+TEST(Hybrid, RejectsInfAssignments) {
+  const std::vector<std::vector<double>> cost = {
+      {1.0, trackbench::kCostInf},
+      {trackbench::kCostInf, trackbench::kCostInf},
+  };
+  const std::vector<int> assign = trackbench::hybrid_minimize(cost);
+  ASSERT_EQ(assign.size(), 2u);
+  EXPECT_EQ(assign[0], 0);
+  EXPECT_EQ(assign[1], -1);
+}

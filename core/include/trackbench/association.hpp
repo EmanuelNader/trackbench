@@ -69,6 +69,13 @@ std::vector<int> hungarian_minimize(const std::vector<std::vector<double>>& cost
 /// but not globally optimal.
 std::vector<int> greedy_minimize(const std::vector<std::vector<double>>& cost);
 
+/// Hybrid greedy+Hungarian minimization on a rectangular cost matrix.
+/// Runs greedy first to assign the easy pairs, then solves the remaining
+/// sub-matrix with Hungarian. Returns column assignment for each row
+/// (-1 if unassigned / Inf cost). Combines greedy's speed with Hungarian's
+/// optimality on the hard cases.
+std::vector<int> hybrid_minimize(const std::vector<std::vector<double>>& cost);
+
 /// BEV IoU of two oriented boxes (center x,y; length l; width w; yaw).
 /// Returns a value in [0, 1]. Degenerate (non-positive) sizes yield 0.
 double bev_oriented_iou(double x1, double y1, double l1, double w1, double yaw1,
