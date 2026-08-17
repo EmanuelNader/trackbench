@@ -9,6 +9,7 @@ core/build/
 **/build-*/
 **/build/
 bench/precision/out/
+bench/ctrv/out/
 cmake-build-*/
 *.o
 *.a
