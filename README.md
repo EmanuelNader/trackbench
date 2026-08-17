@@ -24,8 +24,6 @@ trackbench is an end-to-end loop that:
 | p99 latency (Hungarian) | 0.531 ms | 0.132 ms | 4× faster |
 | p99 latency (greedy) | — | **0.018 ms** | 29× faster |
 
-13 phases, 12 findings — 5 wins, 7 honest nulls. No inflated claims. Every number traces to a committed output file.
-
 <p align="center">
   <img src="docs/assets/triage-bev.png" alt="trackbench bird's-eye triage UI on a dense scene with an ID switch selected" width="900" />
 </p>
