@@ -8,6 +8,7 @@ data/*
 core/build/
 **/build-*/
 **/build/
+bench/precision/out/
 cmake-build-*/
 *.o
 *.a
